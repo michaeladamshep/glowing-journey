@@ -1,0 +1,97 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: rgb(253, 247, 247);
+    color: rgb(0, 13, 13);
+    padding: 1rem;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+ /* Adjust this value to your preference */
+}
+
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.minimized {
+    padding: 0.25em 0;
+    font-size: 0.7em;
+}
+
+.minimized .image-button img {
+    width: 500px; /* Adjust image size */
+    height: auto;
+}
+
+header h1 {
+    margin: 0;
+}
+
+header a {
+    color: inherit; /* Inherit color from the header */
+    text-decoration: none; /* Remove underline */
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center; /* Align items vertically */
+}
+
+nav ul li {
+    margin: 0 0.5rem; /* Reduce margin */
+}
+
+nav ul li a {
+    color: rgb(0, 13, 13);
+    text-decoration: none;
+}
+
+main {
+    padding: 2rem;
+}
+
+section {
+    margin-bottom: 2rem;
+}
+
+footer {
+    background-color: rgb(245, 230, 230);
+    color: rgb(8, 71, 71);
+    text-align: center;
+    padding: 1rem;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+.image-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+}
+
+.image-button img {
+    display: block;
+    max-width: 100%;
+    transition: width 0.3s ease; /* Smooth transition for resizing images */
+}
+
+.image-button:hover img {
+    filter: brightness(0.8); /* Darken the image slightly on hover */
+}
