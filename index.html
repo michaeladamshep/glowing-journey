@@ -1,672 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thinking Out Loud — Head Gone Wrong by Noise</title>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    /* ── Page layout ── */
-    .thinking-page {
-      min-height: 100vh;
-      background: #f8f9fa;
-      padding-top: 90px;
-      padding-bottom: 80px;
-      font-family: 'Roboto', Arial, sans-serif;
-    }
-
-    /* ── Toolbar (mimics Google Docs toolbar) ── */
-    .gdoc-toolbar {
-      position: sticky;
-      top: 72px;
-      z-index: 900;
-      background: #fff;
-      border-bottom: 1px solid #e0e0e0;
-      padding: 6px 16px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-
-    .gdoc-toolbar .doc-title-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 4px 8px 4px 0;
-      border-right: 1px solid #e0e0e0;
-      margin-right: 8px;
-    }
-
-    .gdoc-toolbar .doc-title-bar svg {
-      width: 28px;
-      height: 28px;
-      flex-shrink: 0;
-    }
-
-    .gdoc-toolbar .doc-name {
-      font-size: 18px;
-      font-family: 'Roboto', sans-serif;
-      font-weight: 400;
-      color: #202124;
-      white-space: nowrap;
-    }
-
-    .toolbar-divider {
-      width: 1px;
-      height: 24px;
-      background: #e0e0e0;
-      margin: 0 6px;
-    }
-
-    .toolbar-btn {
-      width: 32px;
-      height: 32px;
-      border: none;
-      background: none;
-      border-radius: 4px;
-      cursor: default;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #444746;
-      font-size: 13px;
-      font-weight: 500;
-      opacity: 0.55;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    .toolbar-font-name {
-      font-size: 12px;
-      color: #444746;
-      opacity: 0.55;
-      padding: 0 8px;
-      pointer-events: none;
-      user-select: none;
-      white-space: nowrap;
-    }
-
-    .toolbar-font-size {
-      font-size: 12px;
-      color: #444746;
-      opacity: 0.55;
-      width: 30px;
-      text-align: center;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    /* ── Live badge ── */
-    .live-badge {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-family: 'Roboto', sans-serif;
-      color: #5f6368;
-      flex-shrink: 0;
-    }
-
-    .live-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #34a853;
-      animation: pulse-dot 2s infinite;
-    }
-
-    .live-dot.disconnected {
-      background: #ea4335;
-      animation: none;
-    }
-
-    .live-dot.connecting {
-      background: #fbbc04;
-      animation: pulse-dot 1s infinite;
-    }
-
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.85); }
-    }
-
-    /* ── Document canvas ── */
-    .gdoc-canvas {
-      max-width: 816px;
-      margin: 24px auto;
-      padding: 0 24px;
-    }
-
-    .gdoc-page {
-      background: #fff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
-      min-height: 1056px;
-      padding: 96px 96px;
-      position: relative;
-      font-family: 'Arial', sans-serif;
-      font-size: 11pt;
-      line-height: 1.15;
-      color: #202124;
-    }
-
-    /* ── Content area ── */
-    #live-content {
-      outline: none;
-      white-space: pre-wrap;
-      word-break: break-word;
-      min-height: 200px;
-      caret-color: #1a73e8;
-      font-size: 11pt;
-      font-family: Arial, sans-serif;
-      line-height: 1.5;
-      color: #202124;
-    }
-
-    #live-content:empty::before {
-      content: attr(data-placeholder);
-      color: #bdc1c6;
-      pointer-events: none;
-    }
-
-    /* Blinking cursor effect on last character when live */
-    .cursor-blink::after {
-      content: '|';
-      color: #1a73e8;
-      animation: blink-cursor 1s step-end infinite;
-      font-weight: 100;
-    }
-
-    @keyframes blink-cursor {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-
-    /* ── Setup panel (shown when no script URL is configured) ── */
-    .setup-panel {
-      background: #e8f0fe;
-      border: 1px solid #c5d3f0;
-      border-radius: 8px;
-      padding: 20px 24px;
-      margin-bottom: 32px;
-      font-family: 'Roboto', sans-serif;
-    }
-
-    .setup-panel h3 {
-      margin: 0 0 10px;
-      font-size: 14px;
-      font-weight: 500;
-      color: #1a73e8;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .setup-panel p {
-      margin: 0 0 12px;
-      font-size: 13px;
-      color: #3c4043;
-      line-height: 1.5;
-    }
-
-    .setup-panel ol {
-      margin: 0 0 14px;
-      padding-left: 20px;
-      font-size: 13px;
-      color: #3c4043;
-      line-height: 1.8;
-    }
-
-    .setup-panel code {
-      background: #fff;
-      border: 1px solid #dadce0;
-      border-radius: 3px;
-      padding: 1px 5px;
-      font-size: 12px;
-      font-family: 'Roboto Mono', monospace;
-      color: #c5221f;
-    }
-
-    .setup-url-input {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .setup-url-input input {
-      flex: 1;
-      padding: 8px 12px;
-      border: 1px solid #dadce0;
-      border-radius: 4px;
-      font-size: 13px;
-      font-family: 'Roboto', sans-serif;
-      color: #202124;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .setup-url-input input:focus {
-      border-color: #1a73e8;
-      box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
-    }
-
-    .setup-url-input button {
-      padding: 8px 18px;
-      background: #1a73e8;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      font-size: 13px;
-      font-family: 'Roboto', sans-serif;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .setup-url-input button:hover {
-      background: #1765cc;
-    }
-
-    /* ── Apps Script code block ── */
-    .script-block {
-      background: #282c34;
-      border-radius: 6px;
-      padding: 16px;
-      margin: 12px 0;
-      overflow-x: auto;
-    }
-
-    .script-block pre {
-      margin: 0;
-      font-family: 'Roboto Mono', 'Courier New', monospace;
-      font-size: 12px;
-      color: #abb2bf;
-      line-height: 1.6;
-      white-space: pre;
-    }
-
-    .script-block .kw  { color: #c678dd; }
-    .script-block .fn  { color: #61afef; }
-    .script-block .str { color: #98c379; }
-    .script-block .cm  { color: #5c6370; font-style: italic; }
-    .script-block .num { color: #d19a66; }
-
-    /* Copy button */
-    .copy-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      margin-top: 8px;
-      padding: 5px 12px;
-      background: #3c4043;
-      color: #e8eaed;
-      border: 1px solid #5f6368;
-      border-radius: 4px;
-      font-size: 12px;
-      cursor: pointer;
-      font-family: 'Roboto', sans-serif;
-      transition: background 0.15s;
-    }
-    .copy-btn:hover { background: #5f6368; }
-
-    /* ── Open in Docs button ── */
-    .open-doc-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      margin-left: 10px;
-      padding: 5px 12px;
-      background: #1a73e8;
-      color: #fff !important;
-      border-radius: 4px;
-      font-size: 12px;
-      font-family: 'Roboto', sans-serif;
-      font-weight: 500;
-      text-decoration: none !important;
-      transition: background 0.15s;
-      white-space: nowrap;
-    }
-    .open-doc-btn:hover { background: #1765cc; }
-    .open-doc-btn[href="#"] { opacity: 0.4; pointer-events: none; }
-
-    /* ── Comment callout ── */
-    .comment-callout {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #e8f0fe;
-      border: 1px solid #c5d3f0;
-      border-radius: 6px;
-      padding: 10px 14px;
-      margin-bottom: 28px;
-      font-size: 13px;
-      font-family: 'Roboto', sans-serif;
-      color: #3c4043;
-      line-height: 1.4;
-    }
-    .comment-callout a {
-      color: #1a73e8;
-      font-weight: 500;
-      text-decoration: none;
-    }
-    .comment-callout a:hover { text-decoration: underline; }
-    .comment-callout[data-hidden="true"] { display: none; }
-
-    /* ── Last updated ── */
-    .last-updated {
-      font-size: 11px;
-      color: #9aa0a6;
-      margin-top: 8px;
-      text-align: right;
-      font-family: 'Roboto', sans-serif;
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 860px) {
-      .gdoc-page { padding: 48px 32px; }
-      .gdoc-canvas { padding: 0 8px; }
-      .gdoc-toolbar .doc-name { font-size: 15px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Head Gone Wrong by Noise</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header id="header">
-    <div class="header-content">
-      <a href="index.html"><h1>Head Gone Wrong by Noise</h1></a>
-      <nav>
-        <ul>
-          <li>
-            <a href="Solodyn.html" class="image-button">
-              <img src="images/7397-removebg-preview.png" alt="Solodyn" style="width:100px;height:auto;">
-            </a>
-          </li>
-          <li>
-            <a href="applemusic.html" class="image-button">
-              <img src="images/apple-music-icon.png" alt="applemusic" style="width:75px;height:auto;">
-            </a>
-          </li>
-          <li>
-            <a href="writing.html" class="image-button">
-              <img src="images/comp2.png" alt="compnotebook" style="width:100px; height: auto;">
-            </a>
-          </li>
-          <li>
-            <a href="misc.html" class="image-button">
-              <img src="images/MISC_Group_Logo_2023.png" alt="misclogo" style="width:100px;height:auto;">
-            </a>
-          </li>
-          <li>
-            <a href="contact.html" class="image-button">
-              <img src="images/contact.png" alt="contact" style="width:100px; height: auto;">
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-
-  <div class="thinking-page">
-
-    <!-- Google-Docs-style toolbar -->
-    <div class="gdoc-toolbar">
-      <!-- Docs icon + title -->
-      <div class="doc-title-bar">
-        <!-- Google Docs icon (simplified SVG) -->
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" fill="#4285f4"/>
-          <path d="M14 2V8H20L14 2Z" fill="#a1c2fa"/>
-          <path d="M8 13H16V14.5H8V13ZM8 16H16V17.5H8V16ZM8 10H12V11.5H8V10Z" fill="white"/>
-        </svg>
-        <span class="doc-name">Thinking Out Loud</span>
-      </div>
-
-      <!-- Fake toolbar buttons (visual only, read-only doc) -->
-      <span class="toolbar-font-name">Arial</span>
-      <div class="toolbar-divider"></div>
-      <span class="toolbar-font-size">11</span>
-      <div class="toolbar-divider"></div>
-      <button class="toolbar-btn" title="Bold"><strong>B</strong></button>
-      <button class="toolbar-btn" title="Italic"><em>I</em></button>
-      <button class="toolbar-btn" title="Underline"><u>U</u></button>
-      <div class="toolbar-divider"></div>
-      <button class="toolbar-btn" title="Align left">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="3" width="14" height="1.5" rx="0.75"/><rect x="1" y="6.5" width="10" height="1.5" rx="0.75"/><rect x="1" y="10" width="14" height="1.5" rx="0.75"/><rect x="1" y="13.5" width="10" height="1.5" rx="0.75"/></svg>
-      </button>
-
-      <!-- Live indicator + Open in Docs button -->
-      <div class="live-badge">
-        <span class="live-dot connecting" id="live-dot"></span>
-        <span id="live-status">Connecting…</span>
-        <a id="open-doc-btn" href="#" target="_blank" rel="noopener" class="open-doc-btn">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-          Open in Docs to comment
-        </a>
-      </div>
-    </div>
-
-    <!-- Document canvas -->
-    <div class="gdoc-canvas">
-
-      <!-- Setup panel — hidden once URL is saved -->
-      <div class="setup-panel" id="setup-panel">
-        <h3>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-          Setup: connect your Google Doc
-        </h3>
-        <p>This page polls a <strong>Google Apps Script Web App</strong> that reads your Google Doc and returns its plain text. Every keystroke you make in that Doc will appear here within ~2 seconds — for free, with no third-party services.</p>
-        <ol>
-          <li>Open your Google Doc → <strong>Extensions → Apps Script</strong></li>
-          <li>Replace all code with the script below, then click <strong>Save</strong></li>
-          <li>Click <strong>Deploy → New deployment → Web app</strong></li>
-          <li>Set <em>Execute as:</em> <code>Me</code>, <em>Who has access:</em> <code>Anyone</code></li>
-          <li>Click <strong>Deploy</strong> and copy the Web App URL</li>
-          <li>Paste it below and click <strong>Save</strong></li>
-        </ol>
-
-        <div class="script-block">
-          <pre id="apps-script-code"><span class="cm">// Google Apps Script — paste into your script editor</span>
-<span class="kw">function</span> <span class="fn">doGet</span>() {
-  <span class="kw">var</span> docId = <span class="str">'YOUR_GOOGLE_DOC_ID_HERE'</span>; <span class="cm">// ← replace this</span>
-  <span class="kw">var</span> doc  = DocumentApp.<span class="fn">openById</span>(docId);
-  <span class="kw">var</span> body = doc.<span class="fn">getBody</span>().<span class="fn">getText</span>();
-  <span class="kw">var</span> output = ContentService
-    .<span class="fn">createTextOutput</span>(JSON.<span class="fn">stringify</span>({ text: body, ts: <span class="kw">new</span> Date().<span class="fn">toISOString</span>() }))
-    .<span class="fn">setMimeType</span>(ContentService.MimeType.JSON);
-  <span class="kw">return</span> output;
-}</pre>
+    <header id="header">
+        <div class="header-content">
+            <a href="index.html"><h1>Head Gone Wrong by Noise</h1></a>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="Solodyn.html" class="image-button">
+                            <img src="images/7397-removebg-preview.png" alt="Solodyn" style="width:100px;height:auto;">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="applemusic.html" class="image-button">
+                            <img src="images/apple-music-icon.png" alt="applemusic" style="width:75px;height:auto;">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="writing.html" class="image-button">
+                            <img src="images/comp2.png" alt="compnotebook" style="width:100px; height: auto;">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="misc.html" class="image-button">
+                            <img src="images/MISC_Group_Logo_2023.png" alt="misclogo" style="width:100px;height:auto;">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="contact.html" class="image-button">
+                            <img src="images/contact.png" alt="contact" style="width:100px; height: auto;">
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
-        <button class="copy-btn" onclick="copyScript()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4C2.9 1 2 1.9 2 3v14h2V3h12V1zm3 4H8C6.9 5 6 5.9 6 7v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-          Copy script
-        </button>
+    </header>
 
-        <p style="margin-top:16px; margin-bottom:6px; font-weight:500; font-size:13px;">Paste your Web App URL:</p>
-        <div class="setup-url-input">
-          <input type="url" id="script-url-input" placeholder="https://script.google.com/macros/s/…/exec">
-          <button onclick="saveScriptUrl()">Save & Connect</button>
-        </div>
-        <p style="margin-top:14px; margin-bottom:6px; font-weight:500; font-size:13px;">Paste your Google Doc's shareable link (so visitors can open & comment):</p>
-        <div class="setup-url-input">
-          <input type="url" id="doc-url-input" placeholder="https://docs.google.com/document/d/…/edit?usp=sharing">
-          <button onclick="saveDocUrl()">Save</button>
-        </div>
-      </div>
+    <footer></footer>
+    <script src="footer.js"></script>
+    <script>
+        window.onscroll = function() {
+            var header = document.getElementById("header");
+            var images = document.querySelectorAll(".image-button img");
+            var title = document.querySelector("header h1");
 
-      <!-- The document page -->
-      <div class="gdoc-page">
-        <!-- Comment callout -->
-        <div class="comment-callout" id="comment-callout">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="#1a73e8"><path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
-          <span>Reading along? <a id="comment-callout-link" href="#" target="_blank" rel="noopener">Open in Google Docs</a> to leave a comment or highlight — I read everything.</span>
-        </div>
-        <div
-          id="live-content"
-          data-placeholder="Waiting for content from your Google Doc…"
-        ></div>
-        <p class="last-updated" id="last-updated"></p>
-      </div>
-
-    </div>
-  </div>
-
-  <footer></footer>
-  <script src="footer.js"></script>
-
-  <script>
-    /* ─── Header scroll shrink (same as index.html) ─── */
-    window.onscroll = function () {
-      var header = document.getElementById('header');
-      var images = document.querySelectorAll('.image-button img');
-      var title  = document.querySelector('header h1');
-      if (document.documentElement.scrollTop > 50) {
-        header.classList.add('minimized');
-        images.forEach(img => { img.style.width = '50px'; img.style.height = 'auto'; });
-        title.style.marginRight = '10px';
-        title.style.textAlign = 'right';
-      } else {
-        header.classList.remove('minimized');
-        images.forEach(img => { img.style.width = '100px'; img.style.height = 'auto'; });
-        title.style.marginRight = '0';
-        title.style.textAlign = 'center';
-      }
-    };
-
-    /* ─── Thinking Out Loud logic ─── */
-    const STORAGE_KEY     = 'thinking_script_url';
-    const DOC_URL_KEY     = 'thinking_doc_url';
-    const POLL_INTERVAL   = 2000;
-
-    const dot             = document.getElementById('live-dot');
-    const statusEl        = document.getElementById('live-status');
-    const contentEl       = document.getElementById('live-content');
-    const lastUpdEl       = document.getElementById('last-updated');
-    const setupPanel      = document.getElementById('setup-panel');
-    const urlInput        = document.getElementById('script-url-input');
-    const docUrlInput     = document.getElementById('doc-url-input');
-    const openDocBtn      = document.getElementById('open-doc-btn');
-    const calloutLink     = document.getElementById('comment-callout-link');
-    const commentCallout  = document.getElementById('comment-callout');
-
-    let scriptUrl = localStorage.getItem(STORAGE_KEY) || '';
-    let docUrl    = localStorage.getItem(DOC_URL_KEY)  || '';
-    let pollTimer = null;
-    let prevText  = '';
-    let failCount = 0;
-
-    function applyDocUrl(url) {
-      if (url) {
-        openDocBtn.href = url;
-        openDocBtn.removeAttribute('style');
-        calloutLink.href = url;
-        commentCallout.removeAttribute('data-hidden');
-      } else {
-        openDocBtn.href = '#';
-        commentCallout.setAttribute('data-hidden', 'true');
-      }
-    }
-
-    function saveDocUrl() {
-      const val = (docUrlInput.value || '').trim();
-      if (val && val.startsWith('http')) {
-        docUrl = val;
-        localStorage.setItem(DOC_URL_KEY, docUrl);
-        applyDocUrl(docUrl);
-      }
-    }
-
-    function setStatus(state) {
-      dot.className = 'live-dot ' + state;
-      const labels = {
-        connecting: 'Connecting…',
-        live:       'Live',
-        disconnected: 'Disconnected — retrying…',
-        waiting:    'Waiting for URL…'
-      };
-      statusEl.textContent = labels[state] || state;
-    }
-
-    function formatTime(isoStr) {
-      try {
-        const d = new Date(isoStr);
-        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      } catch { return ''; }
-    }
-
-    async function fetchDoc() {
-      if (!scriptUrl) return;
-      try {
-        const res  = await fetch(scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + '_t=' + Date.now());
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        const text = (data.text || '').trimEnd();
-
-        failCount = 0;
-        setStatus('live');
-
-        if (text !== prevText) {
-          prevText = text;
-          // Show content; add cursor-blink class briefly to simulate live typing
-          contentEl.textContent = text;
-          contentEl.classList.add('cursor-blink');
-          clearTimeout(contentEl._blinkTimer);
-          contentEl._blinkTimer = setTimeout(() => contentEl.classList.remove('cursor-blink'), 1200);
-        }
-
-        if (data.ts) {
-          lastUpdEl.textContent = 'Last synced: ' + formatTime(data.ts);
-        }
-      } catch (err) {
-        failCount++;
-        if (failCount >= 3) setStatus('disconnected');
-        console.warn('Fetch error:', err);
-      }
-    }
-
-    function startPolling() {
-      if (pollTimer) clearInterval(pollTimer);
-      if (!scriptUrl) { setStatus('waiting'); return; }
-      setStatus('connecting');
-      fetchDoc();
-      pollTimer = setInterval(fetchDoc, POLL_INTERVAL);
-    }
-
-    function saveScriptUrl() {
-      const val = (urlInput.value || '').trim();
-      if (!val || !val.startsWith('http')) {
-        urlInput.style.borderColor = '#ea4335';
-        setTimeout(() => urlInput.style.borderColor = '', 1500);
-        return;
-      }
-      scriptUrl = val;
-      localStorage.setItem(STORAGE_KEY, scriptUrl);
-      setupPanel.style.display = 'none';
-      startPolling();
-    }
-
-    function copyScript() {
-      const code = document.getElementById('apps-script-code').innerText;
-      navigator.clipboard.writeText(code).then(() => {
-        const btn = event.target.closest('button');
-        const orig = btn.innerHTML;
-        btn.innerHTML = '✓ Copied!';
-        setTimeout(() => btn.innerHTML = orig, 2000);
-      });
-    }
-
-    // Init
-    applyDocUrl(docUrl);
-    if (docUrl && docUrlInput) docUrlInput.value = docUrl;
-    if (scriptUrl) {
-      setupPanel.style.display = 'none';
-      startPolling();
-    } else {
-      setStatus('waiting');
-    }
-
-    // Pre-fill input if URL already stored
-    if (scriptUrl && urlInput) urlInput.value = scriptUrl;
-  </script>
+            if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+                header.classList.add("minimized");
+                images.forEach(img => {
+                    img.style.width = "50px";
+                    img.style.height = "auto";
+                });
+                title.style.marginRight = "10px";
+                title.style.textAlign = "right";
+            } else {
+                header.classList.remove("minimized");
+                images.forEach(img => {
+                    img.style.width = "100px";
+                    img.style.height = "auto";
+                });
+                title.style.marginRight = "0";
+                title.style.textAlign = "center";
+            }
+        };
+    </script>
 </body>
 </html>
