@@ -5,66 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Thinking Out Loud — Head Gone Wrong by Noise</title>
   <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     .thinking-page {
-      min-height: 100vh;
-      background: #f8f9fa;
-      padding-top: 90px;
-      padding-bottom: 80px;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 120px 2rem 100px;
     }
 
-    .gdoc-toolbar {
-      position: sticky;
-      top: 72px;
-      z-index: 900;
-      background: #fff;
-      border-bottom: 1px solid #e0e0e0;
-      padding: 6px 16px;
+    .thinking-meta {
       display: flex;
       align-items: center;
-      gap: 4px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-
-    .doc-title-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 4px 12px 4px 0;
-      border-right: 1px solid #e0e0e0;
-      margin-right: 8px;
-    }
-
-    .doc-icon-link {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      flex-shrink: 0;
-    }
-
-    .doc-icon-link svg {
-      width: 28px;
-      height: 28px;
-      transition: opacity 0.15s;
-    }
-
-    .doc-icon-link:hover svg { opacity: 0.75; }
-
-    .doc-name {
-      font-size: 18px;
-      font-family: 'Roboto', sans-serif;
-      font-weight: 400;
-      color: #202124;
-      white-space: nowrap;
-    }
-
-    .toolbar-right {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
     }
 
     .live-badge {
@@ -72,7 +24,6 @@
       align-items: center;
       gap: 6px;
       font-size: 12px;
-      font-family: 'Roboto', sans-serif;
       color: #5f6368;
     }
 
@@ -92,45 +43,21 @@
       50%       { opacity: 0.5; transform: scale(0.85); }
     }
 
-    .open-doc-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 6px 14px;
-      background: #1a73e8;
-      color: #fff;
-      border-radius: 4px;
+    .open-doc-link {
       font-size: 12px;
-      font-family: 'Roboto', sans-serif;
-      font-weight: 500;
+      color: #1a73e8;
       text-decoration: none;
-      transition: background 0.15s;
-      white-space: nowrap;
     }
 
-    .open-doc-btn:hover { background: #1765cc; }
-
-    .gdoc-canvas {
-      max-width: 816px;
-      margin: 24px auto;
-      padding: 0 24px;
-    }
-
-    .gdoc-page {
-      background: #fff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
-      min-height: 1056px;
-      padding: 96px;
-    }
+    .open-doc-link:hover { text-decoration: underline; }
 
     #live-content {
       white-space: pre-wrap;
       word-break: break-word;
-      min-height: 200px;
-      font-size: 11pt;
-      font-family: Arial, sans-serif;
-      line-height: 1.5;
+      font-size: 1rem;
+      line-height: 1.7;
       color: #202124;
+      min-height: 200px;
     }
 
     #live-content:empty::before {
@@ -138,29 +65,10 @@
       color: #bdc1c6;
     }
 
-    .cursor-blink::after {
-      content: '|';
-      color: #1a73e8;
-      animation: blink-cursor 1s step-end infinite;
-      font-weight: 100;
-    }
-
-    @keyframes blink-cursor {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0; }
-    }
-
     .last-updated {
       font-size: 11px;
       color: #9aa0a6;
-      margin-top: 8px;
-      text-align: right;
-      font-family: 'Roboto', sans-serif;
-    }
-
-    @media (max-width: 860px) {
-      .gdoc-page { padding: 48px 32px; }
-      .gdoc-canvas { padding: 0 8px; }
+      margin-top: 1.5rem;
     }
   </style>
 </head>
@@ -201,44 +109,24 @@
   </header>
 
   <div class="thinking-page">
-    <div class="gdoc-toolbar">
-      <div class="doc-title-bar">
-        <a href="https://docs.google.com" target="_blank" rel="noopener" class="doc-icon-link" title="Google Docs">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" fill="#4285f4"/>
-            <path d="M14 2V8H20L14 2Z" fill="#a1c2fa"/>
-            <path d="M8 13H16V14.5H8V13ZM8 16H16V17.5H8V16ZM8 10H12V11.5H8V10Z" fill="white"/>
-          </svg>
-        </a>
-        <span class="doc-name" id="doc-title">Thinking Out Loud</span>
+    <div class="thinking-meta">
+      <div class="live-badge">
+        <span class="live-dot connecting" id="live-dot"></span>
+        <span id="live-status">Connecting…</span>
       </div>
-
-      <div class="toolbar-right">
-        <div class="live-badge">
-          <span class="live-dot connecting" id="live-dot"></span>
-          <span id="live-status">Connecting…</span>
-        </div>
-        <a
-          href="https://docs.google.com/document/d/1sPvicRUoPuly0GOc4WpmXLUBxnESseu2Tf7Qpw-KdnE/edit?usp=sharing"
-          target="_blank"
-          rel="noopener"
-          class="open-doc-btn"
-        >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-          Open in Docs to comment
-        </a>
-      </div>
+      <a
+        href="https://docs.google.com/document/d/1sPvicRUoPuly0GOc4WpmXLUBxnESseu2Tf7Qpw-KdnE/edit?usp=sharing"
+        target="_blank"
+        rel="noopener"
+        class="open-doc-link"
+      >Open in Docs to comment</a>
     </div>
 
-    <div class="gdoc-canvas">
-      <div class="gdoc-page">
-        <div
-          id="live-content"
-          data-placeholder="Waiting for content from your Google Doc…"
-        ></div>
-        <p class="last-updated" id="last-updated"></p>
-      </div>
-    </div>
+    <div
+      id="live-content"
+      data-placeholder="Waiting for content from your Google Doc…"
+    ></div>
+    <p class="last-updated" id="last-updated"></p>
   </div>
 
   <footer></footer>
@@ -268,7 +156,6 @@
     const statusEl  = document.getElementById('live-status');
     const contentEl = document.getElementById('live-content');
     const lastUpdEl = document.getElementById('last-updated');
-    const titleEl   = document.getElementById('doc-title');
 
     let prevText  = '';
     let failCount = 0;
@@ -287,18 +174,12 @@
         failCount = 0;
         setStatus('live');
 
-        if (data.title && titleEl.textContent !== data.title) {
-          titleEl.textContent = data.title;
-          document.title = data.title + ' — Head Gone Wrong by Noise';
-        }
+        if (data.title) document.title = data.title + ' — Head Gone Wrong by Noise';
 
         const text = (data.text || '').trimEnd();
         if (text !== prevText) {
           prevText = text;
           contentEl.textContent = text;
-          contentEl.classList.add('cursor-blink');
-          clearTimeout(contentEl._bt);
-          contentEl._bt = setTimeout(() => contentEl.classList.remove('cursor-blink'), 1200);
         }
 
         if (data.ts) lastUpdEl.textContent = 'Last synced: ' + new Date(data.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
