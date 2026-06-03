@@ -44,12 +44,6 @@ header {
   color: inherit;
 }
 
-.karenin-logo {
-  width: 34px;
-  height: 34px;
-  flex-shrink: 0;
-  transition: width 0.3s ease, height 0.3s ease;
-}
 
 header h1 {
   margin: 0;

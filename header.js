@@ -7,15 +7,6 @@
   header.innerHTML = `
     <div class="header-content">
       <a href="index.html" class="header-brand">
-        <svg class="karenin-logo" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7 20 Q4 9 10 6 Q15 4 15 15" fill="#1c1c1e"/>
-          <path d="M29 20 Q32 9 26 6 Q21 4 21 15" fill="#1c1c1e"/>
-          <circle cx="18" cy="21" r="12" fill="#1c1c1e"/>
-          <ellipse cx="18" cy="26" rx="6" ry="4" fill="#2c2c2e"/>
-          <ellipse cx="18" cy="23.5" rx="2.8" ry="1.8" fill="#0a0a0a"/>
-          <circle cx="13.5" cy="19" r="1.8" fill="white" opacity="0.65"/>
-          <circle cx="22.5" cy="19" r="1.8" fill="white" opacity="0.65"/>
-        </svg>
         <h1>Head Gone Wrong by Noise</h1>
       </a>
       <nav>
