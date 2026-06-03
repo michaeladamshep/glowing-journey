@@ -10,10 +10,12 @@
       </div>
       <div class="footer-center">
         <nav class="footer-nav">
+          <a href="lol.html">LoL</a>
+          <a href="catchphrase.html">Catchphrase</a>
+          <a href="thinking.html">Thinking Out Loud</a>
           <a href="Solodyn.html">Solodyn</a>
           <a href="applemusic.html">Apple Music</a>
           <a href="writing.html">Writing</a>
-          <a href="thinking.html">Thinking Out Loud</a>
           <a href="misc.html">MISC</a>
           <a href="contact.html">Contact</a>
         </nav>
