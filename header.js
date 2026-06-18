@@ -17,27 +17,10 @@
             </a>
           </li>
           <li>
-            <a href="applemusic.html" class="image-button">
-              <img src="images/apple-music-icon.png" alt="Apple Music" data-full="75" data-min="40">
-            </a>
-          </li>
-          <li>
             <a href="writing.html" class="image-button">
               <img src="images/comp2.png" alt="Writing" data-full="100" data-min="50">
             </a>
           </li>
-          <li>
-            <a href="misc.html" class="image-button">
-              <img src="images/MISC_Group_Logo_2023.png" alt="MISC" data-full="100" data-min="50">
-            </a>
-          </li>
-          <li>
-            <a href="contact.html" class="image-button">
-              <img src="images/contact.png" alt="Contact" data-full="100" data-min="50">
-            </a>
-          </li>
-          <li><a href="lol.html" class="nav-text-btn">LoL</a></li>
-          <li><a href="catchphrase.html" class="nav-text-btn">Catchphrase</a></li>
         </ul>
       </nav>
     </div>
