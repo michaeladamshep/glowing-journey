@@ -200,7 +200,7 @@ footer {
 .home-content {
   max-width: 680px;
   margin: 0 auto;
-  padding: 110px 2rem 80px;
+  padding: 140px 2rem 80px;
 }
 
 .status-card {
@@ -236,7 +236,7 @@ footer {
 .content-page {
   max-width: 680px;
   margin: 0 auto;
-  padding: 110px 2rem 80px;
+  padding: 140px 2rem 80px;
 }
 
 .content-page > h1 {
@@ -283,7 +283,7 @@ footer {
 .thinking-page {
   max-width: 680px;
   margin: 0 auto;
-  padding: 110px 2rem 80px;
+  padding: 140px 2rem 80px;
 }
 
 .thinking-meta {
@@ -349,7 +349,7 @@ footer {
    MISC PAGES
    ============================================================ */
 main {
-  padding: 110px 2rem 80px;
+  padding: 140px 2rem 80px;
   max-width: 900px;
   margin: 0 auto;
 }
