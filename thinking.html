@@ -12,6 +12,168 @@
   <meta property="og:type" content="website">
   <link rel="canonical" href="https://headgonebynoise.com/thinking.html">
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .comment-highlight {
+      background: rgba(255, 213, 0, 0.2);
+      border-bottom: 2px solid rgba(255, 213, 0, 0.5);
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.15s;
+    }
+    .comment-highlight:hover {
+      background: rgba(255, 213, 0, 0.4);
+    }
+
+    #comment-add-btn {
+      position: fixed;
+      background: rgba(255, 213, 0, 0.95);
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 1000;
+      display: none;
+      letter-spacing: 0.04em;
+    }
+    #comment-add-btn:hover {
+      background: rgb(255, 213, 0);
+    }
+
+    #comment-popover {
+      position: fixed;
+      background: rgba(18, 18, 18, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 14px 16px;
+      max-width: 300px;
+      min-width: 180px;
+      backdrop-filter: blur(16px);
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+    .popover-comment { margin-bottom: 10px; }
+    .popover-comment:last-child { margin-bottom: 0; }
+    .popover-author {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.45);
+      margin-bottom: 3px;
+    }
+    .popover-text {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.45;
+    }
+    .popover-time {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.25);
+      margin-top: 3px;
+    }
+    .popover-divider {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      margin: 10px 0;
+    }
+
+    #comment-form-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1001;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    #comment-form-overlay.visible {
+      display: flex;
+    }
+    .comment-form-card {
+      background: rgba(18, 18, 18, 0.97);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 24px;
+      width: 420px;
+      max-width: 90vw;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+    }
+    .comment-form-card h3 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 600;
+    }
+    .comment-selected-preview {
+      background: rgba(255, 213, 0, 0.08);
+      border-left: 3px solid rgba(255, 213, 0, 0.5);
+      padding: 8px 12px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.45);
+      border-radius: 0 4px 4px 0;
+      max-height: 64px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+    .comment-form-card input,
+    .comment-form-card textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      font-family: inherit;
+      resize: none;
+    }
+    .comment-form-card input:focus,
+    .comment-form-card textarea:focus {
+      outline: none;
+      border-color: rgba(255, 213, 0, 0.4);
+    }
+    .comment-form-card input::placeholder,
+    .comment-form-card textarea::placeholder {
+      color: rgba(255, 255, 255, 0.2);
+    }
+    .comment-form-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.45);
+      border-radius: 7px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    .btn-submit {
+      background: rgba(255, 213, 0, 0.95);
+      border: none;
+      color: #000;
+      border-radius: 7px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+    }
+    .btn-submit:hover { background: rgb(255, 213, 0); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
 </head>
 <body>
   <header></header>
@@ -38,18 +200,137 @@
     <p class="last-updated" id="last-updated"></p>
   </div>
 
+  <button id="comment-add-btn">Comment</button>
+  <div id="comment-popover"></div>
+
+  <div id="comment-form-overlay">
+    <div class="comment-form-card">
+      <h3>Add a comment</h3>
+      <div class="comment-selected-preview" id="comment-selected-preview"></div>
+      <input type="text" id="comment-author" placeholder="Your name (optional)">
+      <textarea id="comment-text" placeholder="Your comment…" rows="4"></textarea>
+      <div class="comment-form-actions">
+        <button class="btn-cancel" id="comment-cancel">Cancel</button>
+        <button class="btn-submit" id="comment-submit">Post</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzqrh_iHN3l7YNchR7bLTrOpNV11_tJJ1kXkfMwA6C4ShKlpSMcPtxkaeITT2-UeqkHFw/exec';
-    const POLL_MS    = 2000;
+    const POLL_MS = 2000;
+    const SUPABASE_URL = 'https://hhpxtwbmdjhbrynrwxjh.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_0FF74VRP57uQg5QIgenqIw_VLrlcJQD';
 
-    const dot       = document.getElementById('live-dot');
-    const statusEl  = document.getElementById('live-status');
-    const contentEl = document.getElementById('live-content');
-    const lastUpdEl = document.getElementById('last-updated');
+    const dot           = document.getElementById('live-dot');
+    const statusEl      = document.getElementById('live-status');
+    const contentEl     = document.getElementById('live-content');
+    const lastUpdEl     = document.getElementById('last-updated');
+    const addBtn        = document.getElementById('comment-add-btn');
+    const popover       = document.getElementById('comment-popover');
+    const formOverlay   = document.getElementById('comment-form-overlay');
+    const selectedPreview = document.getElementById('comment-selected-preview');
+    const authorInput   = document.getElementById('comment-author');
+    const commentInput  = document.getElementById('comment-text');
+    const submitBtn     = document.getElementById('comment-submit');
+    const cancelBtn     = document.getElementById('comment-cancel');
 
-    let prevText  = '';
+    let prevText = '';
     let failCount = 0;
+    let currentComments = [];
+    let pendingAnchor = '';
+    let popoverHideTimer = null;
+
+    // --- Supabase ---
+
+    async function fetchComments() {
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/comments?doc_id=eq.thinking&order=created_at.asc`,
+          { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+        );
+        if (!res.ok) return;
+        currentComments = await res.json();
+        renderContent();
+      } catch (e) {}
+    }
+
+    async function postComment(anchorText, commentText, authorName) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/comments`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify({
+          doc_id: 'thinking',
+          anchor_text: anchorText,
+          comment_text: commentText,
+          author_name: authorName || 'Anonymous'
+        })
+      });
+      return res.ok;
+    }
+
+    // --- Rendering ---
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderContent() {
+      if (!prevText) return;
+
+      const anchors = new Map();
+      for (const c of currentComments) {
+        if (!anchors.has(c.anchor_text)) anchors.set(c.anchor_text, []);
+        anchors.get(c.anchor_text).push(c);
+      }
+
+      if (!anchors.size) {
+        contentEl.innerHTML = escapeHtml(prevText).replace(/\n/g, '<br>');
+        return;
+      }
+
+      const ranges = [];
+      for (const [anchorText] of anchors) {
+        let idx = 0;
+        while (idx < prevText.length) {
+          const pos = prevText.indexOf(anchorText, idx);
+          if (pos === -1) break;
+          ranges.push({ start: pos, end: pos + anchorText.length, anchorText });
+          idx = pos + anchorText.length;
+        }
+      }
+      ranges.sort((a, b) => a.start - b.start);
+
+      let html = '';
+      let pos = 0;
+      for (const r of ranges) {
+        if (r.start < pos) continue;
+        html += escapeHtml(prevText.slice(pos, r.start)).replace(/\n/g, '<br>');
+        const inner = escapeHtml(prevText.slice(r.start, r.end)).replace(/\n/g, '<br>');
+        html += `<mark class="comment-highlight" data-anchor="${encodeURIComponent(r.anchorText)}">${inner}</mark>`;
+        pos = r.end;
+      }
+      html += escapeHtml(prevText.slice(pos)).replace(/\n/g, '<br>');
+      contentEl.innerHTML = html;
+
+      contentEl.querySelectorAll('.comment-highlight').forEach(el => {
+        el.addEventListener('mouseenter', showPopover);
+        el.addEventListener('mouseleave', () => {
+          popoverHideTimer = setTimeout(() => { popover.style.display = 'none'; }, 200);
+        });
+      });
+    }
+
+    // --- Google Doc polling ---
 
     function setStatus(state) {
       dot.className = 'live-dot ' + state;
@@ -58,7 +339,7 @@
 
     async function fetchDoc() {
       try {
-        const res  = await fetch(SCRIPT_URL + '?_t=' + Date.now());
+        const res = await fetch(SCRIPT_URL + '?_t=' + Date.now());
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
 
@@ -70,20 +351,106 @@
         const text = (data.text || '').trimEnd();
         if (text !== prevText) {
           prevText = text;
-          contentEl.textContent = text;
+          renderContent();
         }
 
         if (data.ts) lastUpdEl.textContent = 'Last synced: ' + new Date(data.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
       } catch (err) {
         failCount++;
         if (failCount >= 3) setStatus('disconnected');
       }
     }
 
+    // --- Popover ---
+
+    function showPopover(e) {
+      clearTimeout(popoverHideTimer);
+      const anchor = decodeURIComponent(e.currentTarget.dataset.anchor);
+      const comments = currentComments.filter(c => c.anchor_text === anchor);
+      if (!comments.length) return;
+
+      popover.innerHTML = comments.map((c, i) => `
+        ${i > 0 ? '<hr class="popover-divider">' : ''}
+        <div class="popover-comment">
+          <div class="popover-author">${escapeHtml(c.author_name)}</div>
+          <div class="popover-text">${escapeHtml(c.comment_text)}</div>
+          <div class="popover-time">${new Date(c.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}</div>
+        </div>
+      `).join('');
+
+      popover.style.display = 'block';
+      const rect = e.currentTarget.getBoundingClientRect();
+      const top = rect.bottom + 8;
+      const left = Math.max(16, Math.min(rect.left, window.innerWidth - popover.offsetWidth - 16));
+      popover.style.top = top + 'px';
+      popover.style.left = left + 'px';
+
+      popover.onmouseenter = () => clearTimeout(popoverHideTimer);
+      popover.onmouseleave = () => {
+        popoverHideTimer = setTimeout(() => { popover.style.display = 'none'; }, 200);
+      };
+    }
+
+    // --- Selection ---
+
+    document.addEventListener('mouseup', () => {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !contentEl.contains(sel.anchorNode)) {
+        addBtn.style.display = 'none';
+        return;
+      }
+      const text = sel.toString().trim();
+      if (!text) { addBtn.style.display = 'none'; return; }
+
+      const range = sel.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      addBtn.style.display = 'block';
+      const btnW = addBtn.offsetWidth || 80;
+      addBtn.style.top = (rect.top - 38) + 'px';
+      addBtn.style.left = Math.max(8, rect.left + rect.width / 2 - btnW / 2) + 'px';
+      pendingAnchor = text;
+    });
+
+    addBtn.addEventListener('click', () => {
+      addBtn.style.display = 'none';
+      window.getSelection()?.removeAllRanges();
+      selectedPreview.textContent = pendingAnchor;
+      authorInput.value = '';
+      commentInput.value = '';
+      formOverlay.classList.add('visible');
+      commentInput.focus();
+    });
+
+    cancelBtn.addEventListener('click', () => formOverlay.classList.remove('visible'));
+
+    formOverlay.addEventListener('click', e => {
+      if (e.target === formOverlay) formOverlay.classList.remove('visible');
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') formOverlay.classList.remove('visible');
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      const text = commentInput.value.trim();
+      if (!text) return;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Posting…';
+      const ok = await postComment(pendingAnchor, text, authorInput.value.trim());
+      if (ok) {
+        formOverlay.classList.remove('visible');
+        await fetchComments();
+      }
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Post';
+    });
+
+    // --- Init ---
     setStatus('connecting');
     fetchDoc();
     setInterval(fetchDoc, POLL_MS);
+    fetchComments();
+    setInterval(fetchComments, 30000);
   </script>
 </body>
 </html>
