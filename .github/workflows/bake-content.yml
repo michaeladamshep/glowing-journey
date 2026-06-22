@@ -1,0 +1,63 @@
+name: Bake Google Doc content
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bake:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch and bake content
+        run: |
+          python3 - <<'EOF'
+          import urllib.request, json, re, sys
+
+          url = 'https://script.google.com/macros/s/AKfycbyR6KR2mxJeuQW8thQU4y23IyPO5ObP8aBtK2_jpgvFqLXby6oB_-AZywNZdTFgZQ9BvA/exec'
+          try:
+              with urllib.request.urlopen(url, timeout=30) as r:
+                  data = json.load(r)
+          except Exception as e:
+              print(f'Fetch failed: {e}', file=sys.stderr)
+              sys.exit(1)
+
+          html = data.get('html', '').strip()
+          if not html:
+              print('No HTML in response.', file=sys.stderr)
+              sys.exit(1)
+
+          with open('thinking.html', 'r') as f:
+              content = f.read()
+
+          new_content = re.sub(
+              r'<!-- BAKED_START -->.*?<!-- BAKED_END -->',
+              f'<!-- BAKED_START -->{html}<!-- BAKED_END -->',
+              content,
+              flags=re.DOTALL
+          )
+
+          with open('thinking.html', 'w') as f:
+              f.write(new_content)
+
+          print('Content baked.')
+          EOF
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add thinking.html
+          if git diff --cached --quiet; then
+            echo "No changes, skipping commit."
+          else
+            git commit -m "chore: bake Google Doc content"
+            git push
+          fi
