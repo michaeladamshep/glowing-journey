@@ -13,6 +13,17 @@
   <link rel="canonical" href="https://headgonebynoise.com/thinking.html">
   <link rel="stylesheet" href="styles.css">
   <style>
+    #read-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: #1a1a2e;
+      z-index: 1001;
+      transition: width 0.1s linear;
+    }
+
     .comment-highlight-wrap { display: inline; cursor: pointer; }
     .comment-highlight {
       background: rgba(251, 188, 4, 0.25);
@@ -225,6 +236,7 @@
     <p class="last-updated" id="last-updated"></p>
   </div>
 
+  <div id="read-progress"></div>
   <button id="comment-add-btn">Comment</button>
   <div id="comment-popover"></div>
 
@@ -477,6 +489,14 @@
       }
       submitBtn.disabled = false;
       submitBtn.textContent = 'Post';
+    });
+
+    // --- Progress bar ---
+    const progressBar = document.getElementById('read-progress');
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      progressBar.style.width = (total > 0 ? (scrolled / total) * 100 : 0) + '%';
     });
 
     // --- Init ---
