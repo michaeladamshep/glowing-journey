@@ -488,7 +488,8 @@
 
     // --- Selection ---
 
-    document.addEventListener('mouseup', () => {
+    document.addEventListener('mouseup', e => {
+      if (addBtn.contains(e.target)) return;
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || !contentEl.contains(sel.anchorNode)) {
         addBtn.style.display = 'none';
@@ -502,7 +503,10 @@
       addBtn.style.display = 'block';
       const btnW = addBtn.offsetWidth || 80;
       addBtn.style.top = (rect.top - 38) + 'px';
-      addBtn.style.left = Math.max(8, rect.left + rect.width / 2 - btnW / 2) + 'px';
+      addBtn.style.left = Math.min(
+        window.innerWidth - btnW - 8,
+        Math.max(8, rect.left + rect.width / 2 - btnW / 2)
+      ) + 'px';
       pendingAnchor = text;
     });
 
