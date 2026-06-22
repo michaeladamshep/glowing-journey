@@ -379,6 +379,8 @@
       return map;
     }
 
+    const BLOCK_TAGS = new Set(['UL', 'OL', 'DIV', 'BODY', 'HTML']);
+
     function applyHighlight(anchorText, start, end) {
       const map = buildTextNodeMap();
       const startEntry = map.find(e => start >= e.start && start < e.end);
@@ -388,6 +390,12 @@
         const range = document.createRange();
         range.setStart(startEntry.node, start - startEntry.start);
         range.setEnd(endEntry.node,     end   - endEntry.start);
+
+        // Skip if the range spans multiple block-level containers — wrapping
+        // an inline span around block elements breaks layout.
+        const ancestor = range.commonAncestorContainer;
+        if (ancestor === contentEl || (ancestor.nodeType === Node.ELEMENT_NODE && BLOCK_TAGS.has(ancestor.tagName))) return;
+
         const mark = document.createElement('mark');
         mark.className = 'comment-highlight';
         mark.appendChild(range.extractContents());
