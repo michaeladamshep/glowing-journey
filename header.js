@@ -21,6 +21,12 @@
               <img src="images/comp2.png" alt="Writing" data-full="100" data-min="50">
             </a>
           </li>
+          <li class="contact-nav-item">
+            <span class="nav-text-btn contact-trigger">Contact</span>
+            <div class="contact-tooltip">
+              <a href="mailto:michaeladamshep@gmail.com">michaeladamshep@gmail.com</a>
+            </div>
+          </li>
         </ul>
       </nav>
     </div>

@@ -21,33 +21,50 @@ jobs:
           python3 - <<'EOF'
           import urllib.request, json, re, sys
 
-          url = 'https://script.google.com/macros/s/AKfycbyR6KR2mxJeuQW8thQU4y23IyPO5ObP8aBtK2_jpgvFqLXby6oB_-AZywNZdTFgZQ9BvA/exec'
-          try:
-              with urllib.request.urlopen(url, timeout=30) as r:
-                  data = json.load(r)
-          except Exception as e:
-              print(f'Fetch failed: {e}', file=sys.stderr)
+          SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyR6KR2mxJeuQW8thQU4y23IyPO5ObP8aBtK2_jpgvFqLXby6oB_-AZywNZdTFgZQ9BvA/exec'
+
+          PAGES = [
+              ('thinking.html',   '1sPvicRUoPuly0GOc4WpmXLUBxnESseu2Tf7Qpw-KdnE'),
+              ('standup.html',    '1ceWu--vWErq0ON5yppRCbnf3V4Yk2q-A0QVuVRBPYgU'),
+              ('catchphrase.html','1CAOdaeFoDDrK1I5098Nxn5OltsSNV-DdlqrAzdRQ56A'),
+              ('calling.html',    '14C6sNIVrApObw9AqMadSBZKt3jRYJb--__D6EgdM6Fk'),
+              ('worst-thing.html','1MR52ysUUT5agZxGb_K8BgVB3XkZvxQdsnTQ-QsMQuOo'),
+          ]
+
+          any_failed = False
+          for filename, doc_id in PAGES:
+              url = f'{SCRIPT_URL}?docId={doc_id}'
+              try:
+                  with urllib.request.urlopen(url, timeout=30) as r:
+                      data = json.load(r)
+              except Exception as e:
+                  print(f'Fetch failed for {filename}: {e}', file=sys.stderr)
+                  any_failed = True
+                  continue
+
+              html = data.get('html', '').strip()
+              if not html:
+                  print(f'No HTML for {filename}', file=sys.stderr)
+                  any_failed = True
+                  continue
+
+              with open(filename, 'r') as f:
+                  content = f.read()
+
+              new_content = re.sub(
+                  r'<!-- BAKED_START -->.*?<!-- BAKED_END -->',
+                  f'<!-- BAKED_START -->{html}<!-- BAKED_END -->',
+                  content,
+                  flags=re.DOTALL
+              )
+
+              with open(filename, 'w') as f:
+                  f.write(new_content)
+
+              print(f'Baked {filename}.')
+
+          if any_failed:
               sys.exit(1)
-
-          html = data.get('html', '').strip()
-          if not html:
-              print('No HTML in response.', file=sys.stderr)
-              sys.exit(1)
-
-          with open('thinking.html', 'r') as f:
-              content = f.read()
-
-          new_content = re.sub(
-              r'<!-- BAKED_START -->.*?<!-- BAKED_END -->',
-              f'<!-- BAKED_START -->{html}<!-- BAKED_END -->',
-              content,
-              flags=re.DOTALL
-          )
-
-          with open('thinking.html', 'w') as f:
-              f.write(new_content)
-
-          print('Content baked.')
           EOF
 
       - name: Commit if changed

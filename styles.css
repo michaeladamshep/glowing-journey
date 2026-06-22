@@ -127,6 +127,43 @@ nav ul li a {
   background: rgba(0, 0, 0, 0.11);
 }
 
+.contact-nav-item {
+  position: relative;
+}
+
+.contact-tooltip {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  padding: 10px 14px;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 1100;
+}
+
+.contact-nav-item:hover .contact-tooltip {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.contact-tooltip a {
+  font-size: 13px;
+  color: #1a1a2e;
+  text-decoration: none;
+}
+
+.contact-tooltip a:hover {
+  text-decoration: underline;
+}
+
 /* ============================================================
    FOOTER — glass
    ============================================================ */
