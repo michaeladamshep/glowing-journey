@@ -234,8 +234,7 @@
       <div class="comment-selected-preview" id="comment-selected-preview"></div>
       <input type="text" id="comment-author" placeholder="Your name (optional)">
       <textarea id="comment-text" placeholder="Your comment…" rows="4"></textarea>
-      <div class="comment-form-hint">⌘↵ or Ctrl+↵ to post</div>
-      <div class="comment-form-actions">
+<div class="comment-form-actions">
         <button class="btn-cancel" id="comment-cancel">Cancel</button>
         <button class="btn-submit" id="comment-submit">Post</button>
       </div>
@@ -334,7 +333,7 @@
           idx = pos + anchorText.length;
         }
       }
-      ranges.sort((a, b) => a.start - b.start);
+      ranges.sort((a, b) => a.start - b.start || b.anchorText.length - a.anchorText.length);
 
       let html = '';
       let pos = 0;
@@ -342,10 +341,8 @@
         if (r.start < pos) continue;
         html += escapeHtml(prevText.slice(pos, r.start)).replace(/\n/g, '<br>');
         const inner = escapeHtml(prevText.slice(r.start, r.end)).replace(/\n/g, '<br>');
-        const count = (anchors.get(r.anchorText) || []).length;
-        const badge = count > 1 ? `<span class="comment-count" aria-hidden="true">${count}</span>` : '';
         const encoded = encodeURIComponent(r.anchorText);
-        html += `<span class="comment-highlight-wrap" data-anchor="${encoded}"><mark class="comment-highlight">${inner}</mark>${badge}</span>`;
+        html += `<span class="comment-highlight-wrap" data-anchor="${encoded}"><mark class="comment-highlight">${inner}</mark></span>`;
         pos = r.end;
       }
       html += escapeHtml(prevText.slice(pos)).replace(/\n/g, '<br>');
@@ -395,7 +392,11 @@
     function showPopover(e) {
       clearTimeout(popoverHideTimer);
       const anchor = decodeURIComponent(e.currentTarget.dataset.anchor);
-      const comments = currentComments.filter(c => c.anchor_text === anchor);
+      const comments = currentComments.filter(c =>
+        c.anchor_text === anchor ||
+        anchor.includes(c.anchor_text) ||
+        c.anchor_text.includes(anchor)
+      );
       if (!comments.length) return;
 
       popover.innerHTML = comments.map((c, i) => `
