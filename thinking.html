@@ -24,6 +24,17 @@
       transition: width 0.1s linear;
     }
 
+    #live-content h1 { font-size: 1.5rem; font-weight: 700; margin: 1.5rem 0 0.5rem; color: #1a1a2e; }
+    #live-content h2 { font-size: 1.2rem; font-weight: 600; margin: 1.25rem 0 0.4rem; color: #1a1a2e; }
+    #live-content h3 { font-size: 1rem; font-weight: 600; margin: 1rem 0 0.3rem; color: #1a1a2e; }
+    #live-content p  { margin: 0 0 0.9rem; }
+    #live-content ul, #live-content ol { margin: 0 0 0.9rem; padding-left: 1.5rem; }
+    #live-content li { margin-bottom: 0.25rem; }
+    #live-content a  { color: #1a73e8; text-decoration: none; }
+    #live-content a:hover { text-decoration: underline; }
+    #live-content strong { font-weight: 600; }
+    #live-content mark { border-radius: 2px; padding: 0 1px; }
+
     .comment-highlight-wrap { display: inline; cursor: pointer; }
     .comment-highlight {
       background: rgba(251, 188, 4, 0.25);
@@ -254,7 +265,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzqrh_iHN3l7YNchR7bLTrOpNV11_tJJ1kXkfMwA6C4ShKlpSMcPtxkaeITT2-UeqkHFw/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyR6KR2mxJeuQW8thQU4y23IyPO5ObP8aBtK2_jpgvFqLXby6oB_-AZywNZdTFgZQ9BvA/exec';
     const POLL_MS = 2000;
     const SUPABASE_URL = 'https://hhpxtwbmdjhbrynrwxjh.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_0FF74VRP57uQg5QIgenqIw_VLrlcJQD';
@@ -272,6 +283,7 @@
     const submitBtn     = document.getElementById('comment-submit');
     const cancelBtn     = document.getElementById('comment-cancel');
 
+    let prevHtml = '';
     let prevText = '';
     let failCount = 0;
     let currentComments = [];
@@ -322,18 +334,19 @@
     }
 
     function renderContent() {
-      if (!prevText) return;
+      if (!prevHtml) return;
+      contentEl.innerHTML = prevHtml;
+      prevText = (contentEl.innerText || contentEl.textContent || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      applyCommentHighlights();
+    }
 
+    function applyCommentHighlights() {
       const anchors = new Map();
       for (const c of currentComments) {
         if (!anchors.has(c.anchor_text)) anchors.set(c.anchor_text, []);
         anchors.get(c.anchor_text).push(c);
       }
-
-      if (!anchors.size) {
-        contentEl.innerHTML = escapeHtml(prevText).replace(/\n/g, '<br>');
-        return;
-      }
+      if (!anchors.size) return;
 
       const allRanges = [];
       for (const [anchorText] of anchors) {
@@ -345,31 +358,45 @@
           idx = pos + anchorText.length;
         }
       }
+      if (!allRanges.length) return;
 
-      contentEl.innerHTML = buildSegment(allRanges, 0, prevText.length);
+      // Apply end-to-start so earlier positions stay valid
+      allRanges.sort((a, b) => b.start - a.start || (b.end - b.start) - (a.end - a.start));
+      for (const r of allRanges) applyHighlight(r.anchorText, r.start, r.end);
+
       attachHighlightListeners();
     }
 
-    function buildSegment(ranges, from, to) {
-      const sorted = ranges
-        .filter(r => r.start >= from && r.end <= to)
-        .sort((a, b) => a.start - b.start || (b.end - b.start) - (a.end - a.start));
-
-      let html = '';
-      let pos = from;
-
-      for (const r of sorted) {
-        if (r.start < pos) continue;
-        html += escapeHtml(prevText.slice(pos, r.start)).replace(/\n/g, '<br>');
-        const children = ranges.filter(x => x !== r && x.start >= r.start && x.end <= r.end);
-        const innerHtml = buildSegment(children, r.start, r.end);
-        const encoded = encodeURIComponent(r.anchorText);
-        html += `<span class="comment-highlight-wrap" data-anchor="${encoded}"><mark class="comment-highlight">${innerHtml}</mark></span>`;
-        pos = r.end;
+    function buildTextNodeMap() {
+      const map = [];
+      const walker = document.createTreeWalker(contentEl, NodeFilter.SHOW_TEXT);
+      let pos = 0, node;
+      while ((node = walker.nextNode())) {
+        const len = node.textContent.length;
+        map.push({ node, start: pos, end: pos + len });
+        pos += len;
       }
+      return map;
+    }
 
-      html += escapeHtml(prevText.slice(pos, to)).replace(/\n/g, '<br>');
-      return html;
+    function applyHighlight(anchorText, start, end) {
+      const map = buildTextNodeMap();
+      const startEntry = map.find(e => start >= e.start && start < e.end);
+      const endEntry   = map.find(e => end   >  e.start && end   <= e.end);
+      if (!startEntry || !endEntry) return;
+      try {
+        const range = document.createRange();
+        range.setStart(startEntry.node, start - startEntry.start);
+        range.setEnd(endEntry.node,     end   - endEntry.start);
+        const mark = document.createElement('mark');
+        mark.className = 'comment-highlight';
+        mark.appendChild(range.extractContents());
+        const wrap = document.createElement('span');
+        wrap.className = 'comment-highlight-wrap';
+        wrap.dataset.anchor = encodeURIComponent(anchorText);
+        wrap.appendChild(mark);
+        range.insertNode(wrap);
+      } catch (e) {}
     }
 
     function attachHighlightListeners() {
@@ -413,9 +440,9 @@
 
         if (data.title) document.title = data.title + ' — Head Gone Wrong by Noise';
 
-        const text = (data.text || '').trimEnd();
-        if (text !== prevText) {
-          prevText = text;
+        const html = (data.html || '').trim();
+        if (html !== prevHtml) {
+          prevHtml = html;
           renderContent();
         }
 
