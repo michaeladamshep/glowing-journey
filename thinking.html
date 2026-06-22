@@ -336,7 +336,12 @@
     function renderContent() {
       if (!prevHtml) return;
       contentEl.innerHTML = prevHtml;
-      prevText = (contentEl.innerText || contentEl.textContent || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      // Extract plain text by concatenating text nodes directly — must match
+      // buildTextNodeMap positions exactly (innerText adds block-level \n that text nodes don't have)
+      const walker = document.createTreeWalker(contentEl, NodeFilter.SHOW_TEXT);
+      let t = '', n;
+      while ((n = walker.nextNode())) t += n.textContent;
+      prevText = t;
       applyCommentHighlights();
     }
 
