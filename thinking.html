@@ -335,33 +335,60 @@
         return;
       }
 
-      const ranges = [];
+      const allRanges = [];
       for (const [anchorText] of anchors) {
         let idx = 0;
         while (idx < prevText.length) {
           const pos = prevText.indexOf(anchorText, idx);
           if (pos === -1) break;
-          ranges.push({ start: pos, end: pos + anchorText.length, anchorText });
+          allRanges.push({ start: pos, end: pos + anchorText.length, anchorText });
           idx = pos + anchorText.length;
         }
       }
-      ranges.sort((a, b) => a.start - b.start || b.anchorText.length - a.anchorText.length);
+
+      contentEl.innerHTML = buildSegment(allRanges, 0, prevText.length);
+      attachHighlightListeners();
+    }
+
+    function buildSegment(ranges, from, to) {
+      const sorted = ranges
+        .filter(r => r.start >= from && r.end <= to)
+        .sort((a, b) => a.start - b.start || (b.end - b.start) - (a.end - a.start));
 
       let html = '';
-      let pos = 0;
-      for (const r of ranges) {
+      let pos = from;
+
+      for (const r of sorted) {
         if (r.start < pos) continue;
         html += escapeHtml(prevText.slice(pos, r.start)).replace(/\n/g, '<br>');
-        const inner = escapeHtml(prevText.slice(r.start, r.end)).replace(/\n/g, '<br>');
+        const children = ranges.filter(x => x !== r && x.start >= r.start && x.end <= r.end);
+        const innerHtml = buildSegment(children, r.start, r.end);
         const encoded = encodeURIComponent(r.anchorText);
-        html += `<span class="comment-highlight-wrap" data-anchor="${encoded}"><mark class="comment-highlight">${inner}</mark></span>`;
+        html += `<span class="comment-highlight-wrap" data-anchor="${encoded}"><mark class="comment-highlight">${innerHtml}</mark></span>`;
         pos = r.end;
       }
-      html += escapeHtml(prevText.slice(pos)).replace(/\n/g, '<br>');
-      contentEl.innerHTML = html;
 
+      html += escapeHtml(prevText.slice(pos, to)).replace(/\n/g, '<br>');
+      return html;
+    }
+
+    function attachHighlightListeners() {
       contentEl.querySelectorAll('.comment-highlight-wrap').forEach(el => {
-        el.addEventListener('mouseenter', showPopover);
+        el.addEventListener('mouseenter', e => {
+          e.stopPropagation();
+          clearTimeout(popoverHideTimer);
+          const allAnchors = [];
+          let node = e.currentTarget;
+          while (node && node !== contentEl) {
+            if (node.classList && node.classList.contains('comment-highlight-wrap')) {
+              allAnchors.push(decodeURIComponent(node.dataset.anchor));
+            }
+            node = node.parentElement;
+          }
+          const comments = currentComments.filter(c => allAnchors.includes(c.anchor_text));
+          if (!comments.length) return;
+          showPopover(e.currentTarget, comments);
+        });
         el.addEventListener('mouseleave', () => {
           popoverHideTimer = setTimeout(() => { popover.style.display = 'none'; }, 200);
         });
@@ -401,16 +428,7 @@
 
     // --- Popover ---
 
-    function showPopover(e) {
-      clearTimeout(popoverHideTimer);
-      const anchor = decodeURIComponent(e.currentTarget.dataset.anchor);
-      const comments = currentComments.filter(c =>
-        c.anchor_text === anchor ||
-        anchor.includes(c.anchor_text) ||
-        c.anchor_text.includes(anchor)
-      );
-      if (!comments.length) return;
-
+    function showPopover(el, comments) {
       popover.innerHTML = comments.map((c, i) => `
         ${i > 0 ? '<hr class="popover-divider">' : ''}
         <div class="popover-comment">
@@ -421,7 +439,7 @@
       `).join('');
 
       popover.style.display = 'block';
-      const rect = e.currentTarget.getBoundingClientRect();
+      const rect = el.getBoundingClientRect();
       const top = rect.bottom + 8;
       const left = Math.max(16, Math.min(rect.left, window.innerWidth - popover.offsetWidth - 16));
       popover.style.top = top + 'px';
