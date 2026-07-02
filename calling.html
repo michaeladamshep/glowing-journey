@@ -58,6 +58,19 @@
   <script src="header.js"></script>
 
   <div class="thinking-page">
+    <div class="thinking-meta">
+      <div class="live-badge">
+        <span class="live-dot connecting" id="live-dot"></span>
+        <span id="live-status">Connecting…</span>
+      </div>
+      <a
+        href="https://docs.google.com/document/d/14C6sNIVrApObw9AqMadSBZKt3jRYJb--__D6EgdM6Fk/edit?usp=sharing"
+        target="_blank"
+        rel="noopener"
+        class="open-doc-link"
+      >Open in Docs</a>
+    </div>
+
     <div id="live-content" data-placeholder="Loading…"><!-- BAKED_START --><!-- BAKED_END --></div>
     <p class="last-updated" id="last-updated"></p>
   </div>
@@ -83,9 +96,12 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyR6KR2mxJeuQW8thQU4y23IyPO5ObP8aBtK2_jpgvFqLXby6oB_-AZywNZdTFgZQ9BvA/exec';
     const DOC_ID    = '14C6sNIVrApObw9AqMadSBZKt3jRYJb--__D6EgdM6Fk';
     const PAGE_SLUG = 'calling';
+    const POLL_MS = 60000;
     const SUPABASE_URL = 'https://hhpxtwbmdjhbrynrwxjh.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_0FF74VRP57uQg5QIgenqIw_VLrlcJQD';
 
+    const dot             = document.getElementById('live-dot');
+    const statusEl        = document.getElementById('live-status');
     const contentEl       = document.getElementById('live-content');
     const lastUpdEl       = document.getElementById('last-updated');
     const addBtn          = document.getElementById('comment-add-btn');
@@ -99,6 +115,7 @@
 
     let prevHtml = '';
     let prevText = '';
+    let failCount = 0;
     let currentComments = [];
     let pendingAnchor = '';
     let popoverHideTimer = null;
@@ -219,16 +236,26 @@
       popover.onmouseleave = () => { popoverHideTimer = setTimeout(() => { popover.style.display = 'none'; }, 200); };
     }
 
+    function setStatus(state) {
+      dot.className = 'live-dot ' + state;
+      statusEl.textContent = { connecting: 'Connecting…', live: 'Live', disconnected: 'Disconnected — retrying…' }[state] || state;
+    }
+
     async function fetchDoc() {
       try {
         const res = await fetch(`${SCRIPT_URL}?docId=${DOC_ID}&_t=${Date.now()}`);
         if (!res.ok) throw new Error();
         const data = await res.json();
+        failCount = 0;
+        setStatus('live');
         if (data.title) document.title = data.title + ' — Head Gone Wrong by Noise';
         const html = (data.html || '').trim();
         if (html && html !== prevHtml) { prevHtml = html; renderContent(); }
         if (data.ts) lastUpdEl.textContent = 'Last synced: ' + new Date(data.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-      } catch (e) {}
+      } catch (e) {
+        failCount++;
+        if (failCount >= 3) setStatus('disconnected');
+      }
     }
 
     document.addEventListener('mouseup', e => {
@@ -280,7 +307,9 @@
       progressBar.style.width = (total > 0 ? (window.scrollY / total) * 100 : 0) + '%';
     });
 
+    setStatus('connecting');
     fetchDoc();
+    setInterval(fetchDoc, POLL_MS);
     fetchComments();
     setInterval(fetchComments, 30000);
   </script>
