@@ -237,60 +237,20 @@ footer {
 }
 
 /* ============================================================
-   CONTENT PAGES (LoL, Catchphrase, Thinking)
-   ============================================================ */
-.content-page {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 140px 2rem 80px;
-}
-
-.content-page > h1 {
-  font-family: var(--font-heading);
-  font-size: 1.7rem;
-  font-weight: 700;
-  margin: 0 0 0.3rem;
-  color: #1a1a2e;
-}
-
-.page-meta {
-  font-size: 0.78rem;
-  color: #999;
-  margin: 0 0 2.5rem;
-}
-
-.content-body {
-  font-size: 1rem;
-  line-height: 1.75;
-  color: #2a2a3a;
-}
-
-.content-body h2 { font-family: var(--font-heading); font-size: 1.25rem; margin-top: 2rem; color: #1a1a2e; }
-.content-body h3 { font-family: var(--font-heading); font-size: 1.05rem; margin-top: 1.5rem; color: #1a1a2e; }
-.content-body p  { margin: 0 0 1rem; }
-
-.comments-section {
-  margin-top: 3.5rem;
-  padding-top: 2rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.07);
-}
-
-.comments-section h2 {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #aaa;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin: 0 0 1.5rem;
-}
-
-/* ============================================================
    THINKING PAGE — live doc
    ============================================================ */
 .thinking-page {
   max-width: 680px;
   margin: 0 auto;
   padding: 140px 2rem 80px;
+}
+
+.thinking-page > h1 {
+  font-family: var(--font-heading);
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin: 0 0 1.25rem;
+  color: #1a1a2e;
 }
 
 .thinking-meta {
