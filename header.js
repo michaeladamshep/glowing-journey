@@ -6,7 +6,7 @@
   header.id = 'header';
   header.innerHTML = `
     <div class="header-content">
-      <button class="header-menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false">HGBN</button>
+      <button class="header-menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false">Head Gone By Noise</button>
       <span class="header-page-title"></span>
     </div>
   `;
