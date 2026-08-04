@@ -7,7 +7,7 @@
   header.innerHTML = `
     <div class="header-content">
       <a href="index.html" class="header-brand">
-        <h1>Head Gone by Noise</h1>
+        <h1>Head Gone By Noise</h1>
       </a>
       <nav>
         <ul>
