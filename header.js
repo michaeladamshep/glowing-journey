@@ -7,7 +7,7 @@
   header.innerHTML = `
     <div class="header-content">
       <button class="header-menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false">Head Gone By Noise</button>
-      <span class="header-page-title"></span>
+      <h1 class="header-page-title"></h1>
     </div>
   `;
 
@@ -59,11 +59,12 @@
     header.classList.toggle('minimized', document.documentElement.scrollTop > 50);
   });
 
-  // Mirror the page's own <h1> (if it has one) into the header, centered,
-  // so the title stays visible while scrolling since the header is fixed.
+  // Pages that define PAGE_TITLE get it as the header's <h1>, centered, so
+  // it stays visible while scrolling (the header is fixed) without also
+  // duplicating a heading in the page body. Deferred to DOMContentLoaded
+  // since PAGE_TITLE is declared in a later inline <script>.
   document.addEventListener('DOMContentLoaded', function () {
-    const pageH1 = document.querySelector('.thinking-page > h1');
-    if (!pageH1) return;
-    header.querySelector('.header-page-title').textContent = pageH1.textContent;
+    if (typeof PAGE_TITLE === 'undefined') return;
+    header.querySelector('.header-page-title').textContent = PAGE_TITLE;
   });
 })();

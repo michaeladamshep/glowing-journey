@@ -294,14 +294,6 @@ footer {
   padding: 140px 2rem 80px;
 }
 
-.thinking-page > h1 {
-  font-family: var(--font-heading);
-  font-size: 1.7rem;
-  font-weight: 700;
-  margin: 0 0 1.25rem;
-  color: #1a1a2e;
-}
-
 .thinking-meta {
   display: flex;
   align-items: center;
