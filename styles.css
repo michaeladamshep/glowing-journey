@@ -39,6 +39,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
 .header-brand {
@@ -64,6 +65,27 @@ header a {
   text-decoration: none;
 }
 
+.header-page-title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 45%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  pointer-events: none;
+  transition: font-size 0.3s ease;
+}
+
+@media (max-width: 700px) {
+  .header-page-title { display: none; }
+}
+
 .minimized {
   padding: 0.3rem 1.5rem;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
@@ -76,6 +98,10 @@ header a {
 
 .minimized h1 {
   font-size: 0.82rem;
+}
+
+.minimized .header-page-title {
+  font-size: 0.8rem;
 }
 
 /* ============================================================
@@ -250,14 +276,7 @@ footer {
   font-size: 1.7rem;
   font-weight: 700;
   margin: 0 0 1.25rem;
-  padding: 0.85rem 0;
   color: #1a1a2e;
-  position: sticky;
-  top: var(--header-height, 74px);
-  z-index: 999;
-  background: rgba(238, 242, 247, 0.88);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
 }
 
 .thinking-meta {

@@ -9,6 +9,7 @@
       <a href="index.html" class="header-brand">
         <h1>Head Gone By Noise</h1>
       </a>
+      <span class="header-page-title"></span>
       <nav>
         <ul>
           <li>
@@ -30,13 +31,6 @@
     img.style.height = 'auto';
   });
 
-  // Track the header's real height so sticky page titles can sit flush
-  // beneath it, including through the shrink-on-scroll transition below.
-  function syncHeaderHeight() {
-    document.documentElement.style.setProperty('--header-height', header.offsetHeight + 'px');
-  }
-  syncHeaderHeight();
-
   // Shrink header on scroll
   window.addEventListener('scroll', function () {
     const scrolled = document.documentElement.scrollTop > 50;
@@ -44,6 +38,13 @@
     header.querySelectorAll('.image-button img').forEach(img => {
       img.style.width = (scrolled ? img.dataset.min : img.dataset.full) + 'px';
     });
-    syncHeaderHeight();
+  });
+
+  // Mirror the page's own <h1> (if it has one) into the header, centered,
+  // so the title stays visible while scrolling since the header is fixed.
+  document.addEventListener('DOMContentLoaded', function () {
+    const pageH1 = document.querySelector('.thinking-page > h1');
+    if (!pageH1) return;
+    header.querySelector('.header-page-title').textContent = pageH1.textContent;
   });
 })();
