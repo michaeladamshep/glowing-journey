@@ -12,11 +12,6 @@
       <nav>
         <ul>
           <li>
-            <a href="Solodyn.html" class="image-button">
-              <img src="images/7397-removebg-preview.png" alt="Solodyn" data-full="100" data-min="50">
-            </a>
-          </li>
-          <li>
             <a href="writing.html" class="image-button">
               <img src="images/comp2.png" alt="Writing" data-full="100" data-min="50">
             </a>
