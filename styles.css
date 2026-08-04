@@ -42,27 +42,21 @@ header {
   position: relative;
 }
 
-.header-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  text-decoration: none;
-  color: inherit;
-}
-
-
-header h1 {
-  margin: 0;
+.header-menu-toggle {
   font-family: var(--font-heading);
   font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  transition: font-size 0.3s ease;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: font-size 0.3s ease, opacity 0.15s;
 }
 
-header a {
-  color: inherit;
-  text-decoration: none;
+.header-menu-toggle:hover {
+  opacity: 0.65;
 }
 
 .header-page-title {
@@ -91,13 +85,8 @@ header a {
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
 }
 
-.minimized .karenin-logo {
-  width: 22px;
-  height: 22px;
-}
-
-.minimized h1 {
-  font-size: 0.82rem;
+.minimized .header-menu-toggle {
+  font-size: 0.9rem;
 }
 
 .minimized .header-page-title {
@@ -105,58 +94,92 @@ header a {
 }
 
 /* ============================================================
-   NAV
+   SIDEBAR NAV
    ============================================================ */
-nav ul {
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 1090;
+}
+
+.sidebar-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 260px;
+  max-width: 80vw;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 2px 0 24px rgba(0, 0, 0, 0.1);
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+  z-index: 1100;
+  padding: 1.5rem;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #1a1a2e;
+  padding: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.sidebar-nav ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
-nav ul li {
-  margin: 0 0.4rem;
-}
-
-nav ul li a {
+.sidebar-nav ul li a {
   color: #1a1a2e;
   text-decoration: none;
+  font-size: 1rem;
 }
 
-.image-button {
+.sidebar-nav ul li a:hover {
+  opacity: 0.65;
+}
+
+.sidebar-nav .image-button {
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
   outline: none;
-}
-
-.image-button img {
-  display: block;
-  max-width: 100%;
-  transition: width 0.3s ease, opacity 0.15s;
-}
-
-.image-button:hover img {
-  opacity: 0.65;
-}
-
-.nav-text-btn {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: #1a1a2e;
-  padding: 0.3rem 0.75rem;
-  border-radius: 20px;
-  background: rgba(0, 0, 0, 0.06);
-  transition: background 0.15s;
-  white-space: nowrap;
-  text-decoration: none;
   display: inline-block;
 }
 
-.nav-text-btn:hover {
-  background: rgba(0, 0, 0, 0.11);
+.sidebar-nav .image-button img {
+  display: block;
+  width: 70px;
+  height: auto;
+  transition: opacity 0.15s;
+}
+
+.sidebar-nav .image-button:hover img {
+  opacity: 0.65;
 }
 
 /* ============================================================
