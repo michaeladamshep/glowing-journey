@@ -27,7 +27,7 @@ header {
   border-bottom: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 2px 24px rgba(0, 0, 0, 0.06);
   color: #1a1a2e;
-  padding: 0.75rem 1.5rem;
+  padding: 1.1rem 1.5rem;
   position: fixed;
   width: 100%;
   top: 0;
@@ -37,14 +37,19 @@ header {
 
 .header-content {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.header-top-row {
+  display: flex;
+  justify-content: flex-start;
   align-items: center;
-  position: relative;
 }
 
 .header-menu-toggle {
   font-family: var(--font-heading);
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   color: inherit;
@@ -60,37 +65,31 @@ header {
 }
 
 .header-page-title {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  max-width: 45%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  display: none;
+  margin: 0;
+  text-align: center;
   font-family: var(--font-heading);
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: #1a1a2e;
-  pointer-events: none;
   transition: font-size 0.3s ease;
 }
 
-@media (max-width: 700px) {
-  .header-page-title { display: none; }
+.has-title .header-page-title {
+  display: block;
 }
 
 .minimized {
-  padding: 0.3rem 1.5rem;
+  padding: 0.5rem 1.5rem;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
 }
 
 .minimized .header-menu-toggle {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .minimized .header-page-title {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 
 /* ============================================================
@@ -291,7 +290,7 @@ footer {
 .thinking-page {
   max-width: 680px;
   margin: 0 auto;
-  padding: 140px 2rem 80px;
+  padding: 200px 2rem 80px;
 }
 
 .thinking-meta {

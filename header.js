@@ -6,7 +6,9 @@
   header.id = 'header';
   header.innerHTML = `
     <div class="header-content">
-      <button class="header-menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false">Head Gone By Noise</button>
+      <div class="header-top-row">
+        <button class="header-menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false">Head Gone By Noise</button>
+      </div>
       <h1 class="header-page-title"></h1>
     </div>
   `;
@@ -59,12 +61,14 @@
     header.classList.toggle('minimized', document.documentElement.scrollTop > 50);
   });
 
-  // Pages that define PAGE_TITLE get it as the header's <h1>, centered, so
-  // it stays visible while scrolling (the header is fixed) without also
-  // duplicating a heading in the page body. Deferred to DOMContentLoaded
-  // since PAGE_TITLE is declared in a later inline <script>.
+  // Pages that define PAGE_TITLE get it as a second row in the header,
+  // centered, so it stays visible while scrolling (the header is fixed)
+  // without also duplicating a heading in the page body. Deferred to
+  // DOMContentLoaded since PAGE_TITLE is declared in a later inline
+  // <script>.
   document.addEventListener('DOMContentLoaded', function () {
     if (typeof PAGE_TITLE === 'undefined') return;
+    header.classList.add('has-title');
     header.querySelector('.header-page-title').textContent = PAGE_TITLE;
   });
 })();
