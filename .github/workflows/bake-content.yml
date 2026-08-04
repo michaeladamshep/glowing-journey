@@ -19,7 +19,7 @@ jobs:
       - name: Fetch and bake content
         run: |
           python3 - <<'EOF'
-          import urllib.request, json, re, sys
+          import urllib.request, json, re, sys, time
 
           SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyR6KR2mxJeuQW8thQU4y23IyPO5ObP8aBtK2_jpgvFqLXby6oB_-AZywNZdTFgZQ9BvA/exec'
 
@@ -31,14 +31,27 @@ jobs:
               ('worst-thing.html','1MR52ysUUT5agZxGb_K8BgVB3XkZvxQdsnTQ-QsMQuOo'),
           ]
 
+          ATTEMPTS = 3
+
+          def fetch_doc(doc_id):
+              url = f'{SCRIPT_URL}?docId={doc_id}'
+              last_err = None
+              for attempt in range(1, ATTEMPTS + 1):
+                  try:
+                      with urllib.request.urlopen(url, timeout=30) as r:
+                          return json.load(r)
+                  except Exception as e:
+                      last_err = e
+                      if attempt < ATTEMPTS:
+                          time.sleep(5 * attempt)
+              raise last_err
+
           any_failed = False
           for filename, doc_id in PAGES:
-              url = f'{SCRIPT_URL}?docId={doc_id}'
               try:
-                  with urllib.request.urlopen(url, timeout=30) as r:
-                      data = json.load(r)
+                  data = fetch_doc(doc_id)
               except Exception as e:
-                  print(f'Fetch failed for {filename}: {e}', file=sys.stderr)
+                  print(f'Fetch failed for {filename} after {ATTEMPTS} attempts: {e}', file=sys.stderr)
                   any_failed = True
                   continue
 
