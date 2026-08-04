@@ -7,7 +7,10 @@
   header.innerHTML = `
     <div class="header-content">
       <div class="header-top-row">
-        <button class="header-menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false">Head Gone By Noise</button>
+        <button class="header-menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false">
+          <span class="toggle-text">Head Gone By Noise</span>
+          <span class="toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
       </div>
       <h1 class="header-page-title"></h1>
     </div>
