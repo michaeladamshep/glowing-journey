@@ -36,9 +36,9 @@ header {
 }
 
 .header-content {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  align-items: center;
 }
 
 .header-top-row {
@@ -67,7 +67,6 @@ header {
 .header-page-title {
   display: none;
   margin: 0;
-  text-align: center;
   font-family: var(--font-heading);
   font-size: 1.1rem;
   font-weight: 600;
@@ -77,6 +76,33 @@ header {
 
 .has-title .header-page-title {
   display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 50%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .has-title .header-page-title {
+    position: static;
+    transform: none;
+    display: block;
+    align-self: center;
+    max-width: 100%;
+    white-space: normal;
+    overflow: visible;
+    text-align: center;
+  }
 }
 
 .minimized {
@@ -290,7 +316,13 @@ footer {
 .thinking-page {
   max-width: 680px;
   margin: 0 auto;
-  padding: 200px 2rem 80px;
+  padding: 150px 2rem 80px;
+}
+
+@media (max-width: 700px) {
+  .thinking-page {
+    padding-top: 220px;
+  }
 }
 
 .thinking-meta {
