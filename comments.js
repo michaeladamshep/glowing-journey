@@ -101,9 +101,16 @@
     }
     if (!ranges.length) return;
 
-    // Apply end-to-start so earlier positions stay valid
+    // Apply end-to-start so earlier positions stay valid. Skip any range
+    // that overlaps one already applied — nesting a highlight span inside
+    // another produces broken/duplicate DOM (including empty phantom marks).
     ranges.sort((a, b) => b.start - a.start);
-    for (const r of ranges) applyHighlight(r.anchorText, r.start, r.end);
+    const applied = [];
+    for (const r of ranges) {
+      if (applied.some(a => r.start < a.end && r.end > a.start)) continue;
+      applyHighlight(r.anchorText, r.start, r.end);
+      applied.push(r);
+    }
 
     attachHighlightListeners();
   }
