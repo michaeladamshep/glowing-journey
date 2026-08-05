@@ -40,8 +40,9 @@ every content page and fail silently (`catch (e) {}`) rather than throwing.
 ## Architecture
 
 **Pages** (each a standalone `.html` file, no templating — shared structure is duplicated per file):
-`index.html`, `writing.html` (index of writing pieces), `contact.html`, and five "live doc" pages —
-`thinking.html`, `standup.html`, `catchphrase.html`, `calling.html`, `worst-thing.html`.
+`index.html`, `writing.html` (index of writing pieces), `contact.html`, and six "live doc" pages —
+`thinking.html`, `standup.html`, `catchphrase.html`, `calling.html`, `worst-thing.html`,
+`unemployment-journal.html`.
 
 **Shared includes**, loaded via `<script src="...">` on every page:
 - `header.js` — injects the `<header>` content and the sidebar nav into `<header></header>` + the start of
@@ -49,12 +50,12 @@ every content page and fail silently (`catch (e) {}`) rather than throwing.
   declares `const PAGE_TITLE = '...'` before this script runs) rendering that as a second header row.
 - `styles.css` — all styling for every page, single shared file.
 
-**The five "live doc" pages share one pattern** (see `thinking.html` as the reference implementation):
+**The live-doc pages share one pattern** (see `thinking.html` as the reference implementation):
 1. Inline `<script>` block near the end of `<body>` declares three globals *before* loading `comments.js`:
    `PAGE_TITLE`, `PAGE_SLUG` (used as the Supabase `doc_id` key), and `DOC_ID` (the Google Doc ID).
 2. `#live-content` holds baked fallback HTML inside `<!-- BAKED_START -->...<!-- BAKED_END -->` — this is
    what search engines and no-JS clients see, and what the bake workflow overwrites on its cron.
-3. `comments.js` (shared, one copy for all five pages) then does two independent jobs at runtime:
+3. `comments.js` (shared, one copy for all of them) then does two independent jobs at runtime:
    - **Live doc sync**: polls the Apps Script endpoint every 60s, diffs against the last-seen HTML, and
      replaces `#live-content` in place when the doc changed. Status dot (`connecting` / `live` /
      `disconnected`) reflects fetch health.
