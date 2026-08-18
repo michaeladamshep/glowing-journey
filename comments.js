@@ -79,6 +79,9 @@
     while ((n = walker.nextNode())) t += n.textContent;
     prevText = t;
     applyCommentHighlights();
+    // Lets other optional scripts (e.g. journal.js) react whenever
+    // #live-content is replaced, without this file knowing about them.
+    document.dispatchEvent(new CustomEvent('live-content:updated'));
   }
 
   // Comments store no position, only the anchor text — so each anchor is

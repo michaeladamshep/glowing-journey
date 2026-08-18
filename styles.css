@@ -404,6 +404,105 @@ footer {
 }
 
 /* ============================================================
+   JOURNAL NAV — day-entry browser (unemployment-journal page)
+   ============================================================ */
+.journal-nav {
+  border: 1px solid rgba(26, 26, 46, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.55);
+  padding: 14px 16px;
+  margin-bottom: 2rem;
+}
+
+.journal-nav-empty { display: none; }
+
+.journal-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.journal-stats strong { color: #1a1a2e; }
+
+.journal-stats-longest {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.journal-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.journal-random-btn,
+.journal-list-toggle {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: 6px;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.journal-random-btn {
+  background: #1a1a2e;
+  color: #fff;
+  border: none;
+}
+.journal-random-btn:hover { background: #2a2a4e; }
+
+.journal-list-toggle {
+  background: transparent;
+  color: #1a1a2e;
+  border: 1px solid rgba(26, 26, 46, 0.25);
+}
+.journal-list-toggle:hover { background: rgba(26, 26, 46, 0.06); }
+
+.journal-entry-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  border-top: 1px solid rgba(26, 26, 46, 0.08);
+}
+
+.journal-entry-list li + li { border-top: 1px solid rgba(26, 26, 46, 0.06); }
+
+.journal-entry-list a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 2px;
+  font-size: 13px;
+  color: #1a1a2e;
+  text-decoration: none;
+}
+.journal-entry-list a:hover { background: rgba(26, 26, 46, 0.05); }
+
+.journal-entry-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.journal-entry-words { flex: none; font-size: 11px; color: #999; }
+
+/* Brief highlight when a jump/random target lands, so the reader can find
+   where they landed in a page-long wall of text. */
+.journal-entry-flash {
+  animation: journal-flash 1.6s ease;
+  border-radius: 3px;
+}
+@keyframes journal-flash {
+  0%   { background: rgba(251, 188, 4, 0.5); }
+  100% { background: transparent; }
+}
+
+/* ============================================================
    LIVE DOC + COMMENTS (thinking, standup, catchphrase, calling, worst-thing)
    ============================================================ */
 #read-progress {
