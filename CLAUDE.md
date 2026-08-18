@@ -40,9 +40,14 @@ every content page and fail silently (`catch (e) {}`) rather than throwing.
 ## Architecture
 
 **Pages** (each a standalone `.html` file, no templating — shared structure is duplicated per file):
-`index.html`, `writing.html` (index of writing pieces), `contact.html`, and six "live doc" pages —
-`thinking.html`, `standup.html`, `catchphrase.html`, `calling.html`, `worst-thing.html`,
-`unemployment-journal.html`.
+`index.html`, `writing.html` (index of writing pieces), `contact.html`, five "live doc" pages —
+`thinking.html`, `standup.html`, `catchphrase.html`, `calling.html`, `worst-thing.html` — and one
+"finished" writing piece, `unemployment-journal.html` (see below).
+
+The site is moving away from posting in-progress pieces live from Google Docs — the plan going forward is
+to only publish finished work. `unemployment-journal.html` is the first page converted to that model; the
+other five are still work-in-progress and follow the live-doc pattern until finished, at which point they
+should be converted the same way.
 
 **Shared includes**, loaded via `<script src="...">` on every page:
 - `header.js` — injects the `<header>` content and the sidebar nav into `<header></header>` + the start of
@@ -71,6 +76,24 @@ every content page and fail silently (`catch (e) {}`) rather than throwing.
 
 Pages *not* in the live-doc set (`index.html`, `writing.html`, `contact.html`) are plain static HTML with
 no `comments.js` dependency.
+
+**Finished pieces** (currently just `unemployment-journal.html`) keep the same `#live-content` /
+`comments.js` markup as the live-doc pages, but drop `DOC_ID` from the inline `<script>` block (`PAGE_TITLE`
+and `PAGE_SLUG` stay — the latter is still the Supabase `doc_id` key). `comments.js` checks for `DOC_ID` at
+init: if present it runs the live-doc-polling flow as above; if absent it treats the page's own baked-in
+`#live-content` HTML as fixed and only runs the inline-comments half against it. The status dot / "Open in
+Docs" link / "Last synced" markup are removed from these pages since there's nothing to poll. The page must
+also be removed from `PAGES` (and the `git add` list) in `bake-content.yml`, or the cron will keep
+overwriting the finished content from the Doc every 2 hours.
+
+`unemployment-journal.html` additionally loads `journal.js`, which parses "Day N" delineated entries out of
+the *rendered* `#live-content` DOM (not the raw HTML string) and renders a stats bar, a chronological
+jump-to entry list, and a random-entry picker. It's opt-in — guarded on `#journal-nav` existing in the page
+— and re-parses on the `live-content:updated` event `comments.js` dispatches after every `renderContent()`
+call (both the live-doc-sync path and the finished-page path fire it), so it stays in sync automatically if
+`comments.js` ever re-renders. Header-paragraph detection is a length heuristic (`Day \d+` and ≤40 chars) to
+tell real day headers apart from paragraphs that merely mention "Day N" in passing — see the constants atop
+`journal.js` before changing entry-parsing.
 
 ## Conventions
 

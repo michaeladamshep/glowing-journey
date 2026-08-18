@@ -29,7 +29,9 @@ jobs:
               ('catchphrase.html','1CAOdaeFoDDrK1I5098Nxn5OltsSNV-DdlqrAzdRQ56A'),
               ('calling.html',    '14C6sNIVrApObw9AqMadSBZKt3jRYJb--__D6EgdM6Fk'),
               ('worst-thing.html','1MR52ysUUT5agZxGb_K8BgVB3XkZvxQdsnTQ-QsMQuOo'),
-              ('unemployment-journal.html','1lox4qiLmrOHL8kG0oSYWbS2TAQkcoJUfO9f4zJQxgLI'),
+              # unemployment-journal.html removed: it's finished, no longer
+              # synced live from the Doc. See journal.js / comments.js for
+              # the client-side comment-only mode finished pages use.
           ]
 
           ATTEMPTS = 3
@@ -86,7 +88,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add thinking.html standup.html catchphrase.html calling.html worst-thing.html unemployment-journal.html
+          git add thinking.html standup.html catchphrase.html calling.html worst-thing.html
           if git diff --cached --quiet; then
             echo "No changes, skipping commit."
           else

@@ -1,5 +1,8 @@
 // comments.js — live Google Doc sync + inline comments, shared across content pages.
-// Each page defines `PAGE_SLUG` and `DOC_ID` in an inline <script> before this file.
+// Each page defines `PAGE_SLUG` in an inline <script> before this file, and
+// `DOC_ID` too if it's still a work-in-progress piece synced from a Google
+// Doc. Finished pieces omit `DOC_ID`: comments.js then skips doc polling
+// entirely and only powers inline comments on the page's own static content.
 (function () {
   const POLL_MS = 60000;
   const SUPABASE_URL = 'https://hhpxtwbmdjhbrynrwxjh.supabase.co';
@@ -21,6 +24,10 @@
   const progressBar    = document.getElementById('read-progress');
 
   if (!contentEl) return;
+
+  // A page is "live" only if it declared DOC_ID. Finished pieces leave it
+  // out on purpose (see header comment).
+  const isLive = typeof DOC_ID !== 'undefined' && !!DOC_ID;
 
   let prevHtml = '';
   let prevText = '';
@@ -314,9 +321,18 @@
   }
 
   // --- Init ---
-  setStatus('connecting');
-  fetchDoc();
-  setInterval(fetchDoc, POLL_MS);
+  if (isLive) {
+    setStatus('connecting');
+    fetchDoc();
+    setInterval(fetchDoc, POLL_MS);
+  } else {
+    // Finished page, no doc to poll — treat the page's own baked-in
+    // content as the fixed "prevHtml" so renderContent() can still (re)run
+    // to apply comment highlights, without ever touching #live-content
+    // again after this.
+    prevHtml = contentEl.innerHTML;
+    renderContent();
+  }
   fetchComments();
   setInterval(fetchComments, 30000);
 })();
