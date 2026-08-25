@@ -25,10 +25,9 @@ jobs:
 
           PAGES = [
               ('thinking.html',   '1sPvicRUoPuly0GOc4WpmXLUBxnESseu2Tf7Qpw-KdnE'),
-              ('standup.html',    '1ceWu--vWErq0ON5yppRCbnf3V4Yk2q-A0QVuVRBPYgU'),
-              ('catchphrase.html','1CAOdaeFoDDrK1I5098Nxn5OltsSNV-DdlqrAzdRQ56A'),
-              ('calling.html',    '14C6sNIVrApObw9AqMadSBZKt3jRYJb--__D6EgdM6Fk'),
-              ('worst-thing.html','1MR52ysUUT5agZxGb_K8BgVB3XkZvxQdsnTQ-QsMQuOo'),
+              # standup.html, catchphrase.html, calling.html, worst-thing.html
+              # removed from main 2026-08-24: not ready to be public. Their
+              # Doc IDs still exist (see git history) if they come back.
               # unemployment-journal.html removed: it's finished, no longer
               # synced live from the Doc. See journal.js / comments.js for
               # the client-side comment-only mode finished pages use.
@@ -88,7 +87,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add thinking.html standup.html catchphrase.html calling.html worst-thing.html
+          git add thinking.html
           if git diff --cached --quiet; then
             echo "No changes, skipping commit."
           else
