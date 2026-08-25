@@ -8,9 +8,8 @@
     <div class="header-content">
       <div class="header-top-row">
         <button class="header-menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false">
-          <span class="toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          Head Gone By Noise
         </button>
-        <a href="index.html" class="header-title-link">Head Gone By Noise</a>
       </div>
       <h1 class="header-page-title"></h1>
     </div>
