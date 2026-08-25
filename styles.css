@@ -50,6 +50,7 @@ header {
 .header-menu-toggle {
   display: flex;
   align-items: center;
+  gap: 10px;
   font-family: var(--font-heading);
   font-size: 1.25rem;
   font-weight: 700;
@@ -64,6 +65,10 @@ header {
 
 .header-menu-toggle:hover {
   opacity: 0.65;
+}
+
+.toggle-text-short {
+  display: none;
 }
 
 .toggle-icon {
@@ -105,18 +110,18 @@ header {
 
 @media (max-width: 700px) {
   .toggle-text { display: none; }
+  .toggle-text-short { display: inline; }
   .toggle-icon { display: flex; }
 
   .header-content {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.5rem;
   }
   .has-title .header-page-title {
     position: static;
     transform: none;
     display: block;
-    align-self: center;
     max-width: 100%;
     white-space: normal;
     overflow: visible;

@@ -9,6 +9,7 @@
       <div class="header-top-row">
         <button class="header-menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false">
           <span class="toggle-text">Head Gone By Noise</span>
+          <span class="toggle-text-short" aria-hidden="true">HGBN</span>
           <span class="toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
         </button>
       </div>
