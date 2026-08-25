@@ -67,10 +67,6 @@ header {
   opacity: 0.65;
 }
 
-.toggle-text-short {
-  display: none;
-}
-
 .toggle-icon {
   display: none;
   flex-direction: column;
@@ -109,19 +105,19 @@ header {
 }
 
 @media (max-width: 700px) {
-  .toggle-text { display: none; }
-  .toggle-text-short { display: inline; }
+  .header-menu-toggle { font-size: 1rem; gap: 8px; }
   .toggle-icon { display: flex; }
 
   .header-content {
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.5rem;
   }
   .has-title .header-page-title {
     position: static;
     transform: none;
     display: block;
+    align-self: center;
     max-width: 100%;
     white-space: normal;
     overflow: visible;
