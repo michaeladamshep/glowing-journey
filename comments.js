@@ -8,6 +8,7 @@
   const SUPABASE_URL = 'https://hhpxtwbmdjhbrynrwxjh.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_0FF74VRP57uQg5QIgenqIw_VLrlcJQD';
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyR6KR2mxJeuQW8thQU4y23IyPO5ObP8aBtK2_jpgvFqLXby6oB_-AZywNZdTFgZQ9BvA/exec';
+  const AUTHOR_STORAGE_KEY = 'comment_author_name';
 
   const dot            = document.getElementById('live-dot');
   const statusEl       = document.getElementById('live-status');
@@ -46,6 +47,7 @@
       if (!res.ok) return;
       currentComments = await res.json();
       renderContent();
+      renderCommentPanel();
     } catch (e) {}
   }
 
@@ -76,6 +78,98 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  }
+
+  function truncate(str, n) {
+    return str.length > n ? str.slice(0, n).trimEnd() + '…' : str;
+  }
+
+  // --- Toast — feedback that a post/delete actually happened, since the
+  // affected highlight can be off-screen or (if its anchor overlaps another
+  // comment's) never render as a highlight at all. ---
+
+  let toastEl = null;
+  let toastTimer = null;
+  function showToast(message, isError) {
+    if (!toastEl) {
+      toastEl = document.createElement('div');
+      toastEl.id = 'comment-toast';
+      document.body.appendChild(toastEl);
+    }
+    toastEl.textContent = message;
+    toastEl.className = isError ? 'error' : '';
+    // Reflow before adding 'visible' so the transition replays on repeat toasts.
+    void toastEl.offsetWidth;
+    toastEl.classList.add('visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('visible'), 3000);
+  }
+
+  // --- All-comments panel — the only highlighted text is discoverable by
+  // scrolling past it, so this gives a full list of every comment on the
+  // page (including ones whose highlight got skipped for overlapping
+  // another). Built dynamically so pages don't need to hand-add markup. ---
+
+  let panelEl, panelListEl, toggleBtn, toggleCountEl;
+
+  function buildCommentPanel() {
+    toggleBtn = document.createElement('button');
+    toggleBtn.id = 'comment-panel-toggle';
+    toggleBtn.type = 'button';
+    toggleBtn.innerHTML = '💬 <span id="comment-panel-count">0</span>';
+    toggleBtn.addEventListener('click', () => panelEl.classList.toggle('visible'));
+    document.body.appendChild(toggleBtn);
+    toggleCountEl = toggleBtn.querySelector('#comment-panel-count');
+
+    panelEl = document.createElement('div');
+    panelEl.id = 'comment-panel';
+    panelEl.innerHTML =
+      '<div class="comment-panel-header"><span>Comments</span>' +
+      '<button id="comment-panel-close" type="button" aria-label="Close">&times;</button></div>' +
+      '<div id="comment-panel-list"></div>';
+    document.body.appendChild(panelEl);
+    panelListEl = panelEl.querySelector('#comment-panel-list');
+    panelEl.querySelector('#comment-panel-close').addEventListener('click', () => panelEl.classList.remove('visible'));
+  }
+
+  function renderCommentPanel() {
+    if (!toggleBtn) return;
+    toggleCountEl.textContent = currentComments.length;
+    toggleBtn.style.display = currentComments.length ? 'flex' : 'none';
+
+    if (!currentComments.length) {
+      panelListEl.innerHTML = '<p class="comment-panel-empty">No comments yet.</p>';
+      return;
+    }
+
+    const sorted = [...currentComments].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    panelListEl.innerHTML = sorted.map(c => `
+      <div class="comment-panel-item" data-anchor="${encodeURIComponent(c.anchor_text)}">
+        <div class="popover-author">${escapeHtml(c.author_name)}</div>
+        <div class="comment-panel-anchor">“${escapeHtml(truncate(c.anchor_text, 80))}”</div>
+        <div class="popover-text">${escapeHtml(c.comment_text)}</div>
+        <div class="popover-time">${new Date(c.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}</div>
+      </div>
+    `).join('');
+
+    panelListEl.querySelectorAll('.comment-panel-item').forEach(item => {
+      item.addEventListener('click', e => {
+        // Without this, the click bubbles to the document-level listener
+        // that closes the popover on any outside click, undoing the
+        // showPopover() call below in the same tick.
+        e.stopPropagation();
+        const encodedAnchor = item.dataset.anchor;
+        const target = contentEl.querySelector(`.comment-highlight-wrap[data-anchor="${encodedAnchor}"]`);
+        if (!target) {
+          showToast('That comment isn’t highlighted in the text — its selection overlaps another comment.');
+          return;
+        }
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const anchor = decodeURIComponent(encodedAnchor);
+        showPopover(target, currentComments.filter(c => c.anchor_text === anchor));
+        panelEl.classList.remove('visible');
+      });
+    });
   }
 
   function renderContent() {
@@ -277,7 +371,7 @@
     addBtn.style.display = 'none';
     window.getSelection()?.removeAllRanges();
     selectedPreview.textContent = pendingAnchor;
-    authorInput.value = '';
+    authorInput.value = localStorage.getItem(AUTHOR_STORAGE_KEY) || '';
     commentInput.value = '';
     formOverlay.classList.add('visible');
     commentInput.focus();
@@ -302,10 +396,15 @@
     if (!text) return;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Posting…';
-    const ok = await postComment(pendingAnchor, text, authorInput.value.trim());
+    const authorName = authorInput.value.trim();
+    const ok = await postComment(pendingAnchor, text, authorName);
     if (ok) {
+      if (authorName) localStorage.setItem(AUTHOR_STORAGE_KEY, authorName);
       formOverlay.classList.remove('visible');
       await fetchComments();
+      showToast('Comment added.');
+    } else {
+      showToast('Couldn’t post that comment — try again.', true);
     }
     submitBtn.disabled = false;
     submitBtn.textContent = 'Post';
@@ -321,6 +420,7 @@
   }
 
   // --- Init ---
+  buildCommentPanel();
   if (isLive) {
     setStatus('connecting');
     fetchDoc();
