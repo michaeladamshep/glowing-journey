@@ -110,16 +110,15 @@
   // page (including ones whose highlight got skipped for overlapping
   // another). Built dynamically so pages don't need to hand-add markup. ---
 
-  let panelEl, panelListEl, toggleBtn, toggleCountEl;
+  let panelEl, panelListEl, toggleBtn;
 
   function buildCommentPanel() {
     toggleBtn = document.createElement('button');
     toggleBtn.id = 'comment-panel-toggle';
     toggleBtn.type = 'button';
-    toggleBtn.innerHTML = '💬 <span id="comment-panel-count">0</span>';
+    toggleBtn.textContent = 'See all comments';
     toggleBtn.addEventListener('click', () => panelEl.classList.toggle('visible'));
     document.body.appendChild(toggleBtn);
-    toggleCountEl = toggleBtn.querySelector('#comment-panel-count');
 
     panelEl = document.createElement('div');
     panelEl.id = 'comment-panel';
@@ -134,7 +133,6 @@
 
   function renderCommentPanel() {
     if (!toggleBtn) return;
-    toggleCountEl.textContent = currentComments.length;
     toggleBtn.style.display = currentComments.length ? 'flex' : 'none';
 
     if (!currentComments.length) {
