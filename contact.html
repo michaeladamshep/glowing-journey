@@ -41,13 +41,6 @@
     .contact-photo-btn:hover {
       opacity: 0.85;
     }
-    .contact-photo-caption {
-      display: block;
-      margin-top: 0.6rem;
-      font-size: 0.85rem;
-      color: #1a73e8;
-      text-decoration: underline;
-    }
     .contact-email {
       font-size: 1.05rem;
       color: #1a1a2e;
@@ -111,17 +104,6 @@
       width: 100%;
       height: auto;
     }
-    .resume-modal-fallback {
-      text-align: center;
-      padding: 10px;
-      font-size: 0.85rem;
-      color: #1a73e8;
-      text-decoration: none;
-      border-top: 1px solid rgba(0, 0, 0, 0.08);
-    }
-    .resume-modal-fallback:hover {
-      text-decoration: underline;
-    }
     @media (max-width: 700px) {
       .resume-modal { height: 85vh; }
     }
@@ -134,7 +116,6 @@
   <div class="contact-page">
     <button type="button" class="contact-photo-btn" id="resume-trigger" aria-haspopup="dialog" aria-controls="resume-modal-overlay">
       <img class="contact-photo" src="images/contact-photo.jpg" alt="Michael Sheppard">
-      <span class="contact-photo-caption">View résumé</span>
     </button>
     <a class="contact-email" href="mailto:michaeladamshep@gmail.com">michaeladamshep@gmail.com</a>
   </div>
@@ -145,7 +126,6 @@
       <div class="resume-modal-body">
         <img id="resume-modal-img" src="" alt="Michael Sheppard's résumé" loading="lazy">
       </div>
-      <a class="resume-modal-fallback" href="resume.pdf" target="_blank" rel="noopener">Open PDF in new tab ↗</a>
     </div>
   </div>
 
